@@ -1,0 +1,87 @@
+import plant1 from "@/assets/images/plants/plant1.png";
+import plant2 from "@/assets/images/plants/plant2.png";
+import plant3 from "@/assets/images/plants/plant3.jpg";
+import plant4 from "@/assets/images/plants/plant4.jpg";
+
+export const SHOP_CATEGORIES = [
+  { id: "rattan-pots", label: "Rattan pots" },
+  { id: "plant-stands", label: "Plant stands" },
+  { id: "propagation-jars", label: "Propagation jars" },
+  { id: "gardening-tool-kit", label: "Gardening tool kit" },
+];
+
+export const SHOP_MAIN_CATEGORIES = [
+  {
+    id: "rattan-pots",
+    label: "Rattan pots",
+    count: 52,
+    image: plant1,
+  },
+  {
+    id: "plant-stands",
+    label: "Plant stands",
+    count: 38,
+    image: plant2,
+  },
+  {
+    id: "propagation-jars",
+    label: "Propagation jars",
+    count: 44,
+    image: plant3,
+  },
+  {
+    id: "gardening-tool-kit",
+    label: "Gardening tool kit",
+    count: 66,
+    image: plant4,
+  },
+];
+
+export const SHOP_SIZES = [
+  { id: "small", label: "Small" },
+  { id: "medium", label: "Medium" },
+  { id: "large", label: "Large" },
+];
+
+export const SHOP_AVAILABILITY = [
+  { id: "in-stock", label: "In stock" },
+  { id: "pre-order", label: "Pre-order" },
+];
+
+export const SHOP_STYLES = [
+  { id: "modern", label: "Modern" },
+  { id: "minimalist", label: "Minimalist" },
+  { id: "tropical", label: "Tropical" },
+  { id: "rustic", label: "Rustic" },
+];
+
+export const SHOP_SORT_OPTIONS = [
+  { id: "newest", label: "Newest Arrivals" },
+  { id: "price-asc", label: "Price: Low to High" },
+  { id: "price-desc", label: "Price: High to Low" },
+  { id: "name-asc", label: "Name: A to Z" },
+];
+
+export const SHOP_PAGE_SIZE = 12;
+export const SHOP_CATALOG_PAGE_SIZE = 10;
+
+export const SHOP_PRICE_RANGE = {
+  min: 0,
+  max: 500,
+  step: 5,
+};
+
+export const SHOP_SEARCH_PARAM = "search";
+export const SHOP_QUERY_PARAM = "query";
+export const SHOP_PAGE_PARAM = "page";
+export const SHOP_SORT_PARAM = "sort";
+export const SHOP_CATEGORY_PARAM = "category";
+export const SHOP_SIZE_PARAM = "size";
+export const SHOP_AVAILABILITY_PARAM = "availability";
+export const SHOP_STYLE_PARAM = "style";
+export const SHOP_PRICE_MIN_PARAM = "priceMin";
+export const SHOP_PRICE_MAX_PARAM = "priceMax";
+export const SHOP_PRODUCT_PARAM = "product";
+export const SHOP_MODAL_PARAM = "modal";
+export const MODAL_CART = "cart";
+export const MODAL_WISHLIST = "wishlist";
