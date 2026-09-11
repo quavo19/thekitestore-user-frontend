@@ -2,6 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   MODAL_CART,
+  MODAL_SUPPORT,
   MODAL_WISHLIST,
   SHOP_MODAL_PARAM,
 } from "@/constants/shop";
@@ -38,17 +39,20 @@ export function useModalParams() {
 
   const isCartOpen = modal === MODAL_CART;
   const isWishlistOpen = modal === MODAL_WISHLIST;
+  const isSupportOpen = modal === MODAL_SUPPORT;
 
   return useMemo(
     () => ({
       modal,
       isCartOpen,
       isWishlistOpen,
+      isSupportOpen,
       openModal,
       closeModal,
       openCart: () => openModal(MODAL_CART),
       openWishlist: () => openModal(MODAL_WISHLIST),
+      openSupport: () => openModal(MODAL_SUPPORT),
     }),
-    [modal, isCartOpen, isWishlistOpen, openModal, closeModal],
+    [modal, isCartOpen, isWishlistOpen, isSupportOpen, openModal, closeModal],
   );
 }

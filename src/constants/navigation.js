@@ -7,6 +7,7 @@ import inspirationIcon from "@/assets/svgs/Inspiration.svg?raw";
 export const NAV_ITEMS = [
   { label: "Home", path: ROUTES.HOME, icon: homeIcon },
   { label: "Shop", path: ROUTES.SHOP, icon: bagIcon },
+  { label: "Orders", path: ROUTES.ORDERS, icon: bagIcon },
   { label: "Inspiration", path: ROUTES.INSPIRATION, icon: inspirationIcon },
   { label: "About Us", path: ROUTES.ABOUT, icon: groupIcon },
 ];

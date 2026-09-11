@@ -4,63 +4,10 @@ import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { Icon } from "@/components/ui/Icon";
 import { FilterModal } from "@/components/shop/FilterModal";
 import { ShopResultsView } from "@/components/shop/ShopResultsView";
-import { getProductById } from "@/constants/products";
 import { ROUTES } from "@/constants/routes";
 import { useShopParams } from "@/hooks/useShopParams";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import arrowIcon from "@/assets/svgs/arrow-Up.svg?raw";
-
-function ProductDetailView({ product, onClose }) {
-  return (
-    <div className="mx-auto max-w-3xl space-y-6">
-      <button
-        type="button"
-        onClick={onClose}
-        className="inline-flex cursor-pointer items-center gap-2 text-sm font-light text-hero-green transition-opacity hover:opacity-80"
-      >
-        <Icon svg={arrowIcon} className="h-4 w-4 rotate-90" />
-        Back to results
-      </button>
-
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="flex aspect-square items-center justify-center rounded-2xl bg-gray-50 p-8">
-          <img
-            src={product.image}
-            alt={product.name}
-            className="h-full w-full object-contain"
-          />
-        </div>
-
-        <div className="space-y-4">
-          <h2 className="text-2xl font-semibold text-hero-dark">{product.name}</h2>
-          <p className="text-sm font-light text-hero-muted">
-            {product.rating} rating · {product.reviewCount} reviews
-          </p>
-          <div className="flex items-center gap-3">
-            {product.originalPrice > product.price && (
-              <span className="text-lg font-light text-hero-muted line-through">
-                ${product.originalPrice.toFixed(2)}
-              </span>
-            )}
-            <span className="text-2xl font-semibold text-hero-dark">
-              ${product.price.toFixed(2)}
-            </span>
-          </div>
-          <p className="text-sm font-light leading-relaxed text-hero-muted">
-            A healthy, handpicked {product.name.toLowerCase()} ready to brighten
-            your space. Includes care instructions and our plant happiness
-            guarantee.
-          </p>
-          <p className="text-xs font-light uppercase tracking-wide text-hero-muted">
-            {product.availability === "in-stock" ? "In stock" : "Pre-order"} ·{" "}
-            {product.size} size
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export function SearchModal() {
   const navigate = useNavigate();
@@ -80,7 +27,6 @@ export function SearchModal() {
     styles,
     priceMin,
     priceMax,
-    productId,
     paginatedProducts,
     totalCount,
     totalPages,
@@ -90,11 +36,7 @@ export function SearchModal() {
     setQuery,
     applyFilters,
     clearFilters,
-    openProduct,
-    closeProduct,
   } = useShopParams();
-
-  const selectedProduct = productId ? getProductById(productId) : null;
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -178,24 +120,20 @@ export function SearchModal() {
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-4 py-6 lg:px-8">
-          {selectedProduct ? (
-            <ProductDetailView product={selectedProduct} onClose={closeProduct} />
-          ) : (
-            <ShopResultsView
-              query={query}
-              sort={sort}
-              sortLabel={sortLabel}
-              page={page}
-              totalCount={totalCount}
-              totalPages={totalPages}
-              paginatedProducts={paginatedProducts}
-              onSortChange={setSort}
-              onPageChange={setPage}
-              onProductSelect={(product) => openProduct(product.id)}
-              onOpenFilters={() => setIsFilterOpen(true)}
-              onClearFilters={clearFilters}
-            />
-          )}
+          <ShopResultsView
+            query={query}
+            sort={sort}
+            sortLabel={sortLabel}
+            page={page}
+            totalCount={totalCount}
+            totalPages={totalPages}
+            paginatedProducts={paginatedProducts}
+            onSortChange={setSort}
+            onPageChange={setPage}
+            onProductSelect={(product) => navigate(`/products/${product.id}`)}
+            onOpenFilters={() => setIsFilterOpen(true)}
+            onClearFilters={clearFilters}
+          />
         </div>
       </div>
 

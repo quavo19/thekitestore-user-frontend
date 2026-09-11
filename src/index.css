@@ -33,6 +33,27 @@
 }
 
 @layer components {
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+
+    100% {
+      background-position: -200% 0;
+    }
+  }
+
+  .skeleton-shimmer {
+    animation: shimmer 1.4s linear infinite;
+    background-image: linear-gradient(
+      90deg,
+      rgb(220 232 216 / 0.35) 0%,
+      rgb(220 232 216 / 0.85) 50%,
+      rgb(220 232 216 / 0.35) 100%
+    );
+    background-size: 200% 100%;
+  }
+
   .range-thumb {
     pointer-events: none;
   }

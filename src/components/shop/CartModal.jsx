@@ -3,11 +3,30 @@ import closeIcon from "@/assets/svgs/Close.svg?raw";
 import { Icon } from "@/components/ui/Icon";
 import { SideModal } from "@/components/ui/SideModal";
 import { getProductById } from "@/constants/products";
+import { ROUTES } from "@/constants";
 import { useCart } from "@/contexts/CartContext";
+import { useUser } from "@/contexts/UserContext";
 import { useModalParams } from "@/hooks/useModalParams";
 import { sleep } from "@/utils/sleep";
 import { cn } from "@/utils";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
+function variantLabel(product) {
+  const stock = product.defaultVariantStock;
+  const options = (stock?.options || []).filter((option) => option.variant_type_pricing_role !== "base");
+  const names = options.length ? options.map((option) => option.name) : (stock?.option_names || []).map((name) => {
+    const [type, ...value] = String(name).split(":");
+    if (type?.trim().toLowerCase() === "base") return "";
+    return value.join(":").trim() || type?.trim();
+  });
+
+  return names.filter(Boolean);
+}
 
 function CartLineItem({ product, quantity, onUpdateQuantity, onRemove }) {
   const [phase, setPhase] = useState("idle");
@@ -51,8 +70,17 @@ function CartLineItem({ product, quantity, onUpdateQuantity, onRemove }) {
             <p className="truncate text-sm font-semibold text-hero-dark">
               {product.name}
             </p>
+            {variantLabel(product).length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {variantLabel(product).map((option) => (
+                  <span key={option} className="bg-hero-sage/35 px-2 py-1 text-[11px] font-medium text-hero-dark">
+                    {option}
+                  </span>
+                ))}
+              </div>
+            )}
             <p className="mt-1 text-sm font-light text-hero-muted">
-              ${product.price.toFixed(2)} each
+              {money(product.price)} each
             </p>
           </div>
           <button
@@ -91,7 +119,7 @@ function CartLineItem({ product, quantity, onUpdateQuantity, onRemove }) {
             </button>
           </div>
           <span className="text-sm font-semibold text-hero-dark">
-            ${(product.price * quantity).toFixed(2)}
+            {money(product.price * quantity)}
           </span>
         </div>
       </div>
@@ -101,19 +129,32 @@ function CartLineItem({ product, quantity, onUpdateQuantity, onRemove }) {
 
 export function CartModal() {
   const { isCartOpen, closeModal } = useModalParams();
-  const { cartItems, count, isGuest, updateQuantity, removeItem, clearCart, continueAsGuest } =
+  const navigate = useNavigate();
+  const { isAuthenticated, startGoogleAuth } = useUser();
+  const {
+    cartItems,
+    count,
+    isGuest,
+    itemProducts,
+    isSyncingCart,
+    cartError,
+    updateQuantity,
+    removeItem,
+    clearCart,
+    continueAsGuest,
+  } =
     useCart();
 
   const lineItems = useMemo(
     () =>
       cartItems
-        .map(({ productId, quantity }) => {
-          const product = getProductById(productId);
+        .map(({ id, productId, quantity }) => {
+          const product = itemProducts[id] || itemProducts[String(productId)] || getProductById(productId);
           if (!product) return null;
-          return { product, quantity };
+          return { id, product, quantity };
         })
         .filter(Boolean),
-    [cartItems],
+    [cartItems, itemProducts],
   );
 
   const subtotal = lineItems.reduce(
@@ -132,18 +173,23 @@ export function CartModal() {
             <div className="flex items-center justify-between text-sm">
               <span className="font-light text-hero-muted">Subtotal</span>
               <span className="font-semibold text-hero-dark">
-                ${subtotal.toFixed(2)}
+                {money(subtotal)}
               </span>
             </div>
             <button
               type="button"
               onClick={() => {
-                continueAsGuest();
+                if (!isAuthenticated) {
+                  continueAsGuest();
+                  startGoogleAuth(ROUTES.CHECKOUT);
+                  return;
+                }
+                navigate(ROUTES.CHECKOUT);
                 closeModal();
               }}
               className="w-full cursor-pointer rounded-lg bg-hero-green py-3 text-sm font-medium text-white transition-opacity hover:opacity-90"
             >
-              Checkout as Guest
+              {isAuthenticated ? "Proceed to checkout" : "Sign up with Google to continue"}
             </button>
             <button
               type="button"
@@ -166,19 +212,29 @@ export function CartModal() {
           </div>
         )}
 
+        {isSyncingCart && (
+          <p className="mb-4 text-sm font-light text-hero-muted">Syncing your cart...</p>
+        )}
+
+        {cartError && (
+          <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-light text-red-600">
+            {cartError}
+          </p>
+        )}
+
         {lineItems.length > 0 ? (
           <>
             <p className="mb-2 text-sm font-light text-hero-muted">
               {count} {count === 1 ? "item" : "items"} in your cart
             </p>
             <div className="modal-item-list">
-              {lineItems.map(({ product, quantity }) => (
+              {lineItems.map(({ id, product, quantity }) => (
                 <CartLineItem
-                  key={product.id}
+                  key={id}
                   product={product}
                   quantity={quantity}
-                  onUpdateQuantity={(next) => updateQuantity(product.id, next)}
-                  onRemove={() => removeItem(product.id)}
+                  onUpdateQuantity={(next) => updateQuantity(product.id, next, product.defaultVariantStock?.id)}
+                  onRemove={() => removeItem(product.id, product.defaultVariantStock?.id)}
                 />
               ))}
             </div>

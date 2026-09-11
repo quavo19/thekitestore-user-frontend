@@ -18,11 +18,15 @@ export function WishlistItemCard({ product, onSelect }) {
     if (phase !== "idle") return;
 
     setPhase("loading");
-    await sleep(700);
-    setPhase("exiting");
-    await sleep(450);
-    addItem(product.id);
-    remove(product.id);
+    try {
+      await addItem(product.id, 1, product, product.defaultVariantStock?.id);
+      await sleep(350);
+      setPhase("exiting");
+      await sleep(450);
+      await remove(product.id);
+    } catch {
+      setPhase("idle");
+    }
   }
 
   async function handleRemove(event) {
@@ -31,7 +35,11 @@ export function WishlistItemCard({ product, onSelect }) {
 
     setPhase("exiting");
     await sleep(350);
-    remove(product.id);
+    try {
+      await remove(product.id);
+    } catch {
+      setPhase("idle");
+    }
   }
 
   const isBusy = phase !== "idle";

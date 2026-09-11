@@ -1,8 +1,12 @@
 import heartIcon from "@/assets/svgs/Heart.svg?raw";
 import { AddToCartIconButton } from "@/components/shop/AddToCartIconButton";
 import { Icon } from "@/components/ui/Icon";
+import { Spinner } from "@/components/ui/Spinner";
+import { useUser } from "@/contexts/UserContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/utils";
+import { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 function ProductStars({ rating }) {
   const fullStars = Math.floor(rating);
@@ -37,12 +41,27 @@ export function ShopProductCard({
   className,
 }) {
   const { toggle, isWishlisted } = useWishlist();
+  const { isAuthenticated, startGoogleAuth } = useUser();
+  const location = useLocation();
+  const [isWishlistBusy, setIsWishlistBusy] = useState(false);
   const wishlisted = isWishlisted(product.id);
 
-  function handleWishlistClick(event) {
+  async function handleWishlistClick(event) {
     event.preventDefault();
     event.stopPropagation();
-    toggle(product.id);
+    if (isWishlistBusy) return;
+
+    if (!isAuthenticated) {
+      startGoogleAuth(`${location.pathname}${location.search}`);
+      return;
+    }
+
+    setIsWishlistBusy(true);
+    try {
+      await toggle(product.id);
+    } finally {
+      setIsWishlistBusy(false);
+    }
   }
 
   function handleClick() {
@@ -68,21 +87,29 @@ export function ShopProductCard({
             type="button"
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             aria-pressed={wishlisted}
+            aria-busy={isWishlistBusy}
+            disabled={isWishlistBusy}
             onClick={handleWishlistClick}
+            title={!isAuthenticated ? "Sign in to add to wishlist" : undefined}
             className={cn(
               "absolute right-3 top-3 z-[1] inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full shadow-sm transition-colors",
+              isWishlistBusy && "cursor-not-allowed opacity-80",
               wishlisted
                 ? "bg-hero-green text-white hover:bg-hero-green/90"
                 : "bg-white/90 text-hero-muted hover:bg-white",
             )}
           >
-            <Icon
-              svg={heartIcon}
-              className={cn(
-                "h-4 w-4 transition-colors",
-                wishlisted ? "fill-white text-white" : "text-current",
-              )}
-            />
+            {isWishlistBusy ? (
+              <Spinner className={wishlisted ? "text-white" : "text-hero-green"} />
+            ) : (
+              <Icon
+                svg={heartIcon}
+                className={cn(
+                  "h-4 w-4 transition-colors",
+                  wishlisted ? "fill-white text-white" : "text-current",
+                )}
+              />
+            )}
           </button>
         )}
 
@@ -90,6 +117,7 @@ export function ShopProductCard({
           <div className="absolute bottom-3 right-3 z-[1]">
             <AddToCartIconButton
               productId={product.id}
+              product={product}
               availability={product.availability}
             />
           </div>

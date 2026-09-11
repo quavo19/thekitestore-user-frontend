@@ -3,18 +3,20 @@ import { Icon } from "@/components/ui/Icon";
 import { Spinner } from "@/components/ui/Spinner";
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/utils";
-import { sleep } from "@/utils/sleep";
 import { useState } from "react";
 
 export function AddToCartIconButton({
   productId,
+  product = null,
+  variantStockId = null,
   availability = "in-stock",
   className,
   size = "sm",
 }) {
   const { addItem, items } = useCart();
   const [isLoading, setIsLoading] = useState(false);
-  const inCart = Boolean(items[String(productId)]);
+  const selectedVariantStockId = variantStockId || product?.defaultVariantStock?.id;
+  const inCart = Boolean(items[selectedVariantStockId ? `${productId}:${selectedVariantStockId}` : String(productId)]);
   const outOfStock = availability !== "in-stock";
   const disabled = isLoading || inCart || outOfStock;
 
@@ -24,9 +26,11 @@ export function AddToCartIconButton({
     if (disabled) return;
 
     setIsLoading(true);
-    await sleep(600);
-    addItem(productId);
-    setIsLoading(false);
+    try {
+      await addItem(productId, 1, product, selectedVariantStockId);
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   const sizeClasses =

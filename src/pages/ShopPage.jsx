@@ -7,15 +7,17 @@ import { Icon } from "@/components/ui/Icon";
 import { ItemsCarousel } from "@/components/ui/ItemsCarousel";
 import { Pagination } from "@/components/ui/Pagination";
 import { ProductCarouselCard } from "@/components/ui/ProductCarouselCard";
-import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
-import { PRODUCTS } from "@/constants/products";
 import { ROUTES } from "@/constants/routes";
 import {
+  SHOP_CATALOG_PAGE_PARAM,
   SHOP_CATALOG_PAGE_SIZE,
   SHOP_MAIN_CATEGORIES,
 } from "@/constants/shop";
+import { useCustomerProducts } from "@/hooks/useCustomerProducts";
 import { useShopParams } from "@/hooks/useShopParams";
-import { useMemo, useState } from "react";
+import { rememberShopReturn } from "@/utils/shopReturn";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 const CATEGORY_CAROUSEL_ITEMS_PER_VIEW = [
   { minWidth: 1024, count: 4 },
@@ -30,8 +32,13 @@ const NEW_ARRIVALS_ITEMS_PER_VIEW = [
 ];
 
 export function ShopPage() {
+  const navigate = useNavigate();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [catalogPage, setCatalogPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const catalogPageParam = Number(searchParams.get(SHOP_CATALOG_PAGE_PARAM));
+  const catalogPage = Number.isFinite(catalogPageParam) && catalogPageParam > 0 ? catalogPageParam : 1;
+  const { products, isLoadingProducts } = useCustomerProducts();
   const {
     query,
     page,
@@ -51,10 +58,9 @@ export function ShopPage() {
     clearFilters,
     setPage,
     setSort,
-    openProduct,
-  } = useShopParams();
+  } = useShopParams(products);
 
-  const newArrivals = PRODUCTS.slice(0, 8);
+  const newArrivals = products.slice(0, 8);
 
   const filterState = {
     categories,
@@ -68,14 +74,32 @@ export function ShopPage() {
 
   const catalogTotalPages = Math.max(
     1,
-    Math.ceil(DUMMY_PRODUCTS.length / SHOP_CATALOG_PAGE_SIZE),
+    Math.ceil(products.length / SHOP_CATALOG_PAGE_SIZE),
   );
 
   const catalogProducts = useMemo(() => {
     const pageIndex = Math.min(catalogPage, catalogTotalPages);
     const start = (pageIndex - 1) * SHOP_CATALOG_PAGE_SIZE;
-    return DUMMY_PRODUCTS.slice(start, start + SHOP_CATALOG_PAGE_SIZE);
-  }, [catalogPage, catalogTotalPages]);
+    return products.slice(start, start + SHOP_CATALOG_PAGE_SIZE);
+  }, [catalogPage, catalogTotalPages, products]);
+
+  useEffect(() => {
+    rememberShopReturn(`${location.pathname}${location.search}`);
+  }, [location.pathname, location.search]);
+
+  function setCatalogPage(pageNumber) {
+    setSearchParams(
+      (current) => {
+        const next = new URLSearchParams(current);
+        if (pageNumber <= 1) {
+          next.delete(SHOP_CATALOG_PAGE_PARAM);
+        } else {
+          next.set(SHOP_CATALOG_PAGE_PARAM, String(pageNumber));
+        }
+        return next;
+      },
+    );
+  }
 
   function toggleCategory(categoryId) {
     const nextCategories = categories.includes(categoryId)
@@ -98,7 +122,7 @@ export function ShopPage() {
           paginatedProducts={paginatedProducts}
           onSortChange={setSort}
           onPageChange={setPage}
-          onProductSelect={(product) => openProduct(product.id)}
+          onProductSelect={(product) => navigate(`/products/${product.id}`)}
           onOpenFilters={() => setIsFilterOpen(true)}
           onClearFilters={clearFilters}
         />
@@ -153,6 +177,9 @@ export function ShopPage() {
 
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-hero-dark">All Products</h2>
+        {isLoadingProducts && (
+          <p className="text-xs font-light text-hero-muted">Refreshing products...</p>
+        )}
 
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5">
           {catalogProducts.map((product) => (
@@ -160,7 +187,7 @@ export function ShopPage() {
               key={product.id}
               product={product}
               showAddToCart
-              onSelect={() => openProduct(product.id)}
+              onSelect={() => navigate(`/products/${product.id}`)}
             />
           ))}
         </div>
@@ -183,7 +210,7 @@ export function ShopPage() {
             price={plant.price}
             rating={plant.rating}
             image={plant.image}
-            href={`${ROUTES.SHOP}?product=${plant.id}`}
+            href={`/products/${plant.id}`}
           />
         )}
       />

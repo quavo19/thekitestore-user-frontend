@@ -1,5 +1,7 @@
 import { API_BASE_URL } from "@/constants";
 
+const AUTH_TOKEN_STORAGE_KEY = "karaboome-auth-token";
+
 class HttpClient {
   constructor(baseURL = API_BASE_URL) {
     this.baseURL = baseURL;
@@ -7,9 +9,11 @@ class HttpClient {
 
   async request(path, options = {}) {
     const url = `${this.baseURL}${path}`;
+    const token = localStorage.getItem(AUTH_TOKEN_STORAGE_KEY);
     const response = await fetch(url, {
       headers: {
         "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
       ...options,
@@ -17,7 +21,12 @@ class HttpClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(error.message ?? `Request failed with status ${response.status}`);
+      throw new Error(
+        error.message ??
+          error.error ??
+          error.errors?.[0] ??
+          `Request failed with status ${response.status}`,
+      );
     }
 
     if (response.status === 204) {

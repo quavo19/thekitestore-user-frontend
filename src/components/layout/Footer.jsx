@@ -1,5 +1,3 @@
-import instagramIcon from "@/assets/svgs/instagram.svg?raw";
-import tiktokIcon from "@/assets/svgs/TikTok.svg?raw";
 import whatsappIcon from "@/assets/svgs/WhatsApp.svg?raw";
 import { Icon } from "@/components/ui/Icon";
 import { APP_NAME } from "@/constants";
@@ -11,16 +9,6 @@ const FOOTER_LINKS = [
 ];
 
 const SOCIAL_LINKS = [
-  {
-    label: "Instagram: @kara.bloome",
-    href: "https://instagram.com/kara.bloome",
-    icon: instagramIcon,
-  },
-  {
-    label: "TikTok: @kara.bloome",
-    href: "https://tiktok.com/@kara.bloome",
-    icon: tiktokIcon,
-  },
   {
     label: "WhatsApp: +2335013339",
     href: "https://wa.me/2335013339",

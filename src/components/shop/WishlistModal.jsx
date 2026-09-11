@@ -1,17 +1,20 @@
 import { SideModal } from "@/components/ui/SideModal";
 import { WishlistItemCard } from "@/components/shop/WishlistItemCard";
-import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
+import { getProductById } from "@/constants/products";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useModalParams } from "@/hooks/useModalParams";
 import { useMemo } from "react";
 
 export function WishlistModal() {
   const { isWishlistOpen, closeModal } = useModalParams();
-  const { wishlistIds, count } = useWishlist();
+  const { wishlistIds, wishlistProducts, count, isSyncingWishlist, wishlistError } = useWishlist();
 
   const wishlistedProducts = useMemo(
-    () => DUMMY_PRODUCTS.filter((product) => wishlistIds.has(product.id)),
-    [wishlistIds],
+    () =>
+      [...wishlistIds]
+        .map((id) => wishlistProducts[String(id)] || getProductById(id))
+        .filter(Boolean),
+    [wishlistIds, wishlistProducts],
   );
 
   return (
@@ -19,6 +22,16 @@ export function WishlistModal() {
       <div className="px-5 py-6">
         {wishlistedProducts.length > 0 ? (
           <>
+            {isSyncingWishlist && (
+              <p className="mb-4 text-sm font-light text-hero-muted">
+                Syncing your wishlist...
+              </p>
+            )}
+            {wishlistError && (
+              <p className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm font-light text-red-600">
+                {wishlistError}
+              </p>
+            )}
             <p className="mb-4 text-sm font-light text-hero-muted">
               {count} {count === 1 ? "plant" : "plants"} saved
             </p>
