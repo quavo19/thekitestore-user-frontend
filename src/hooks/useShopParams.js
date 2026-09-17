@@ -29,7 +29,7 @@ function parseNumberParam(value, fallback) {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-export function useShopParams(products = DUMMY_PRODUCTS) {
+export function useShopParams(products = DUMMY_PRODUCTS, options = {}) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const params = useMemo(
@@ -242,7 +242,7 @@ export function useShopParams(products = DUMMY_PRODUCTS) {
     let results = [...products];
     const query = params.query.trim().toLowerCase();
 
-    if (query) {
+    if (query && !options.skipLocalQueryFilter) {
       results = results.filter((product) => {
         const name = product.name.toLowerCase();
         const category = product.category.replace(/-/g, " ");
@@ -298,7 +298,7 @@ export function useShopParams(products = DUMMY_PRODUCTS) {
     }
 
     return results;
-  }, [params, products]);
+  }, [options.skipLocalQueryFilter, params, products]);
 
   const totalPages = Math.max(1, Math.ceil(filteredProducts.length / SHOP_PAGE_SIZE));
 

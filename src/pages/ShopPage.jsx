@@ -37,8 +37,9 @@ export function ShopPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
   const catalogPageParam = Number(searchParams.get(SHOP_CATALOG_PAGE_PARAM));
+  const shopQuery = searchParams.get("query") ?? "";
   const catalogPage = Number.isFinite(catalogPageParam) && catalogPageParam > 0 ? catalogPageParam : 1;
-  const { products, isLoadingProducts } = useCustomerProducts();
+  const { products, isLoadingProducts, isUsingFallbackProducts } = useCustomerProducts(shopQuery);
   const {
     query,
     page,
@@ -58,7 +59,9 @@ export function ShopPage() {
     clearFilters,
     setPage,
     setSort,
-  } = useShopParams(products);
+  } = useShopParams(products, {
+    skipLocalQueryFilter: Boolean(shopQuery.trim()) && !isUsingFallbackProducts,
+  });
 
   const newArrivals = products.slice(0, 8);
 

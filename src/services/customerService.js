@@ -87,12 +87,17 @@ export function normalizeCustomerItem(item) {
 }
 
 export const customerService = {
-  getProducts: async () => {
-    const cached = cacheGet("products:index");
+  getProducts: async (params = {}) => {
+    const query = new URLSearchParams();
+    query.set("per_page", params.perPage || 100);
+    if (params.search) query.set("search", params.search);
+
+    const cacheKey = `products:index:${query.toString()}`;
+    const cached = cacheGet(cacheKey);
     if (cached) return cached;
 
-    const response = await api.get("/customer/products?per_page=100");
-    return cacheSet("products:index", {
+    const response = await api.get(`/customer/products?${query.toString()}`);
+    return cacheSet(cacheKey, {
       ...response,
       products: (response?.data || []).map(normalizeApiProduct),
     });

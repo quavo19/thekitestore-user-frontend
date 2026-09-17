@@ -2,7 +2,7 @@ import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
 import { customerService } from "@/services";
 import { useEffect, useMemo, useState } from "react";
 
-export function useCustomerProducts() {
+export function useCustomerProducts(search = "") {
   const [products, setProducts] = useState(DUMMY_PRODUCTS);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
@@ -13,9 +13,11 @@ export function useCustomerProducts() {
       setIsLoadingProducts(true);
 
       try {
-        const response = await customerService.getProducts();
+        const response = await customerService.getProducts({ search: search.trim() });
         if (isMounted && response.products?.length) {
           setProducts(response.products);
+        } else if (isMounted) {
+          setProducts([]);
         }
       } catch {
         if (isMounted) {
@@ -33,7 +35,7 @@ export function useCustomerProducts() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [search]);
 
   return useMemo(
     () => ({
