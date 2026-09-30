@@ -2,6 +2,10 @@ import bagIcon from "@/assets/svgs/Bag.svg?raw";
 import { Icon } from "@/components/ui/Icon";
 import { Link } from "react-router-dom";
 
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
 export function ProductCarouselCard({ name, price, rating, image, href }) {
   return (
     <Link to={href} className="group flex h-full flex-col cursor-pointer">
@@ -19,7 +23,7 @@ export function ProductCarouselCard({ name, price, rating, image, href }) {
 
           <div className="mt-1 flex items-center gap-2">
             <span className="text-[11px] font-light text-hero-dark">
-              ${price.toFixed(2)}
+              {money(price)}
             </span>
             <span className="flex items-center gap-0.5 text-[11px] font-light text-hero-muted">
               {rating}
