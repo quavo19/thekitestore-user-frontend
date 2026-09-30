@@ -308,8 +308,10 @@ export function CheckoutPage() {
 
     setIsPaying(true);
     try {
+      const affiliateVisitorId = customerService.getStoredAffiliateVisitorId();
       const orderResponse = await customerService.createOrder({
         customer_address_id: selectedAddress.id,
+        ...(affiliateVisitorId ? { affiliate_visitor_id: affiliateVisitorId } : {}),
         phones: contactPhones,
         order_items: orderItems,
         fulfillments: [...fulfillmentMap.entries()].map(([warehouseId, items]) => ({
