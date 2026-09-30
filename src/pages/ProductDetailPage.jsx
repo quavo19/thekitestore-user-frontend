@@ -1,11 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import bagIcon from "@/assets/svgs/Bag.svg?raw";
 import { ShopProductCard } from "@/components/shop/ShopProductCard";
 import { Icon } from "@/components/ui/Icon";
 import { Spinner } from "@/components/ui/Spinner";
 import { ROUTES } from "@/constants";
 import { useCart } from "@/contexts/CartContext";
+import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
 import { cn } from "@/utils";
 
@@ -127,8 +128,10 @@ function productGalleryImages(product) {
 
 export function ProductDetailPage() {
   const { productId } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const { addItem, items } = useCart();
+  const { user } = useUser();
   const [product, setProduct] = useState(null);
   const [selectedOptions, setSelectedOptions] = useState({});
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
@@ -139,6 +142,7 @@ export function ProductDetailPage() {
   const [quantitiesByStockId, setQuantitiesByStockId] = useState({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const trackedAffiliateClicks = useRef(new Set());
 
   useEffect(() => {
     let isMounted = true;
@@ -178,6 +182,34 @@ export function ProductDetailPage() {
     };
   }, [productId]);
 
+  useEffect(() => {
+    const affiliateCode = new URLSearchParams(location.search).get("ref")?.trim();
+    if (!affiliateCode || !product?.id) return;
+
+    const trackingKey = `${product.id}:${affiliateCode}`;
+    if (trackedAffiliateClicks.current.has(trackingKey)) return;
+    trackedAffiliateClicks.current.add(trackingKey);
+
+    const visitorId = customerService.getAffiliateVisitorId();
+    customerService.rememberAffiliateAttribution({
+      productId: product.id,
+      affiliateCode,
+      visitorId,
+      landingUrl: window.location.href,
+    });
+    customerService
+      .recordAffiliateClick({
+        productId: product.id,
+        affiliateCode,
+        visitorId,
+        landingUrl: window.location.href,
+        referrerUrl: document.referrer,
+      })
+      .catch(() => {
+        trackedAffiliateClicks.current.delete(trackingKey);
+      });
+  }, [location.search, product?.id]);
+
   const groups = useMemo(() => optionGroups(product), [product]);
   const selectedStock = useMemo(() => {
     const stocks = product?.variantStocks || [];
@@ -187,6 +219,7 @@ export function ProductDetailPage() {
   const selectedImage = selectedImageUrl || selectedStock?.image?.url || product?.images?.[0]?.url || product?.image || "";
   const galleryImages = useMemo(() => productGalleryImages(product), [product]);
   const selectedPrice = selectedStock?.price ?? product?.price ?? 0;
+  const affiliateCommissionAmount = Number(product?.affiliateCommissionAmount || 0);
   const cartKey = selectedStock?.id ? `${product?.id}:${selectedStock.id}` : String(product?.id || "");
   const inCart = Boolean(items[cartKey]);
   const maxQuantity = Number(selectedStock?.available_quantity || 0);
@@ -202,6 +235,23 @@ export function ProductDetailPage() {
   const visibleDescription = !shouldClampDescription || isDescriptionExpanded
     ? description
     : `${description.slice(0, 170).trim()}...`;
+  const affiliateCode = user?.affiliate_profile?.affiliate_code || "";
+  const isApprovedAffiliate = user?.role?.name === "AFFILIATE" && user?.affiliate_profile?.status === "approved";
+  const affiliateLink = isApprovedAffiliate && product?.id && affiliateCode
+    ? `${window.location.origin}/products/${product.id}?ref=${encodeURIComponent(affiliateCode)}`
+    : "";
+
+  async function handleCopyAffiliateLink() {
+    if (!affiliateLink) return;
+    setError("");
+    setMessage("");
+    try {
+      await navigator.clipboard.writeText(affiliateLink);
+      setMessage("Affiliate product link copied.");
+    } catch {
+      setError("Unable to copy the link. Please copy it manually.");
+    }
+  }
 
   async function handleAddToCart() {
     if (!product || !selectedStock || isAdding || outOfStock) return;
@@ -306,7 +356,14 @@ export function ProductDetailPage() {
             </div>
           </div>
 
-          <p className="font-serif text-3xl text-hero-dark">{money(selectedPrice)}</p>
+          <div>
+            <p className="font-serif text-3xl text-hero-dark">{money(selectedPrice)}</p>
+            {affiliateCommissionAmount > 0 && (
+              <p className="mt-1.5 text-sm italic text-hero-green">
+                Affiliate earns {money(affiliateCommissionAmount)}
+              </p>
+            )}
+          </div>
           {Number(product.bonusPoints || 0) > 0 && (
             <p className="text-sm font-light text-hero-green">
               Earn <span className="font-bold">#{Number(product.bonusPoints || 0).toLocaleString()}</span> bonus points
@@ -405,6 +462,26 @@ export function ProductDetailPage() {
           >
             {isAdding ? "Adding..." : inCart ? "In cart" : "Add to cart"}
           </button>
+
+          {isApprovedAffiliate && affiliateLink && (
+            <div className="bg-hero-sage/20 p-4">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-hero-green">Affiliate link</p>
+              <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                <input
+                  value={affiliateLink}
+                  readOnly
+                  className="min-w-0 flex-1 bg-white px-3 py-2 text-sm font-light text-hero-dark outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={handleCopyAffiliateLink}
+                  className="cursor-pointer bg-hero-dark px-4 py-2 text-sm font-medium text-white transition-opacity hover:opacity-90"
+                >
+                  Copy
+                </button>
+              </div>
+            </div>
+          )}
 
           {product.meta?.length > 0 && (
             <div className="grid gap-3 sm:grid-cols-2">
