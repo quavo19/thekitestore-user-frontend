@@ -1,5 +1,9 @@
 import { cn } from "@/utils";
 
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(0)}`;
+}
+
 export function PriceRangeSlider({
   min,
   max,
@@ -49,9 +53,9 @@ export function PriceRangeSlider({
       </div>
 
       <div className="flex items-center justify-between text-xs font-light text-hero-muted">
-        <span>${min}</span>
-        <span>+${Math.round((max - min) / 2)}</span>
-        <span>${max}+</span>
+        <span>{money(min)}</span>
+        <span>{money(Math.round((max - min) / 2))}</span>
+        <span>{money(max)}+</span>
       </div>
     </div>
   );
