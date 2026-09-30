@@ -8,6 +8,10 @@ import { cn } from "@/utils";
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
 function ProductStars({ rating }) {
   const fullStars = Math.floor(rating);
   const hasHalf = rating - fullStars >= 0.5;
@@ -41,10 +45,12 @@ export function ShopProductCard({
   className,
 }) {
   const { toggle, isWishlisted } = useWishlist();
-  const { isAuthenticated, startGoogleAuth } = useUser();
+  const { user, isAuthenticated, startGoogleAuth } = useUser();
   const location = useLocation();
   const [isWishlistBusy, setIsWishlistBusy] = useState(false);
   const wishlisted = isWishlisted(product.id);
+  const isApprovedAffiliate = user?.role?.name === "AFFILIATE" && user?.affiliate_profile?.status === "approved";
+  const affiliateCommissionAmount = Number(product.affiliateCommissionAmount || 0);
 
   async function handleWishlistClick(event) {
     event.preventDefault();
@@ -144,15 +150,27 @@ export function ShopProductCard({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          {product.originalPrice > product.price && (
-            <span className="text-sm font-light text-hero-muted line-through">
-              ${product.originalPrice.toFixed(0)}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            {product.originalPrice > product.price && (
+              <span className="text-sm font-light text-hero-muted line-through">
+                {money(product.originalPrice)}
+              </span>
+            )}
+            <span className="text-sm font-semibold text-hero-dark">
+              {money(product.price)}
             </span>
+          </div>
+          {isApprovedAffiliate && affiliateCommissionAmount > 0 && (
+            <div className="shrink-0 text-right">
+              <p className="text-xs font-semibold text-hero-green">
+                {money(affiliateCommissionAmount)}
+              </p>
+              <p className="text-[10px] italic text-hero-muted">
+                Affiliate earning
+              </p>
+            </div>
           )}
-          <span className="text-sm font-semibold text-hero-dark">
-            ${product.price.toFixed(0)}
-          </span>
         </div>
       </div>
     </article>
