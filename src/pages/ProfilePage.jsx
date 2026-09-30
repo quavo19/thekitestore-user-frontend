@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import googleIcon from "@/assets/svgs/Google.svg?raw";
-import profileImage from "@/assets/images/others/profile.avif";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Icon } from "@/components/ui/Icon";
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { ROUTES } from "@/constants";
 import { useUser } from "@/contexts/UserContext";
@@ -152,7 +152,7 @@ export function ProfilePage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const avatarSrc = user?.avatar || profileImage;
+  const avatarSrc = user?.avatar;
   const displayName =
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
     user?.email ||
@@ -335,10 +335,11 @@ export function ProfilePage() {
       <section className="bg-hero-sage/25 px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
         <div className="grid gap-6 lg:grid-cols-[1fr_0.85fr]">
           <div className="flex items-center gap-4">
-            <img
+            <ProfileAvatar
               src={avatarSrc}
+              name={displayName}
               alt={displayName}
-              className="aspect-square h-20 w-20 shrink-0 rounded-full object-cover"
+              className="aspect-square h-20 w-20 shrink-0 text-5xl"
             />
             <div>
               <p className="font-serif text-3xl text-hero-dark">{displayName}</p>
