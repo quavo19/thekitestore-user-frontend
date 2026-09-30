@@ -8,6 +8,10 @@ import { sleep } from "@/utils/sleep";
 import { cn } from "@/utils";
 import { useState } from "react";
 
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
 export function WishlistItemCard({ product, onSelect }) {
   const { addItem } = useCart();
   const { remove } = useWishlist();
@@ -98,7 +102,7 @@ export function WishlistItemCard({ product, onSelect }) {
           {product.name}
         </h3>
         <p className="text-sm font-semibold text-hero-dark">
-          ${product.price.toFixed(0)}
+          {money(product.price)}
         </p>
         <button
           type="button"
