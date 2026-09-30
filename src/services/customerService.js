@@ -3,6 +3,9 @@ import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
 
 const PRODUCT_CACHE_TTL = 60_000;
 const productCache = new Map();
+const AFFILIATE_VISITOR_STORAGE_KEY = "karaboome-affiliate-visitor-id";
+const AFFILIATE_ATTRIBUTION_STORAGE_KEY = "karaboome-affiliate-attribution";
+const AFFILIATE_SIGNUP_CLAIM_STORAGE_KEY = "karaboome-affiliate-signup-claim";
 
 function cacheGet(key) {
   const cached = productCache.get(key);
@@ -44,6 +47,11 @@ export function normalizeApiProduct(record) {
     price,
     originalPrice: price,
     bonusPoints: Number(attributes.bonus_points || attributes.bonusPoints || 0),
+    affiliateCommissionAmount: Number(
+      attributes.affiliate_commission_amount ||
+        attributes.affiliateCommissionAmount ||
+        0,
+    ),
     rating: Number(attributes.review_summary?.average_points || 5),
     reviewCount: Number(attributes.review_summary?.total_reviews || 0),
     image,
@@ -112,6 +120,76 @@ export const customerService = {
       product: response?.data ? normalizeApiProduct(response.data) : null,
     });
   },
+
+  getAffiliateVisitorId: () => {
+    let visitorId = localStorage.getItem(AFFILIATE_VISITOR_STORAGE_KEY);
+    if (!visitorId) {
+      visitorId = crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      localStorage.setItem(AFFILIATE_VISITOR_STORAGE_KEY, visitorId);
+    }
+    return visitorId;
+  },
+
+  getStoredAffiliateVisitorId: () => localStorage.getItem(AFFILIATE_VISITOR_STORAGE_KEY),
+
+  rememberAffiliateAttribution: (attribution) => {
+    localStorage.setItem(AFFILIATE_ATTRIBUTION_STORAGE_KEY, JSON.stringify({
+      ...attribution,
+      visitorId: attribution.visitorId || customerService.getAffiliateVisitorId(),
+      trackedAt: new Date().toISOString(),
+    }));
+  },
+
+  getRememberedAffiliateAttribution: () => {
+    const raw = localStorage.getItem(AFFILIATE_ATTRIBUTION_STORAGE_KEY);
+    if (!raw) return null;
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      localStorage.removeItem(AFFILIATE_ATTRIBUTION_STORAGE_KEY);
+      return null;
+    }
+  },
+
+  rememberAffiliateCodeFromUrl: () => {
+    const affiliateCode = new URLSearchParams(window.location.search).get("ref")?.trim();
+    if (!affiliateCode) return null;
+
+    const visitorId = customerService.getAffiliateVisitorId();
+    customerService.rememberAffiliateAttribution({
+      affiliateCode,
+      visitorId,
+      landingUrl: window.location.href,
+    });
+    return { affiliateCode, visitorId };
+  },
+
+  hasClaimedSignupReferral: (affiliateCode) =>
+    localStorage.getItem(AFFILIATE_SIGNUP_CLAIM_STORAGE_KEY) === affiliateCode,
+
+  markSignupReferralClaimed: (affiliateCode) => {
+    localStorage.setItem(AFFILIATE_SIGNUP_CLAIM_STORAGE_KEY, affiliateCode);
+  },
+
+  recordSignupReferral: ({ affiliateCode, visitorId }) =>
+    api.post("/affiliate_signup_referrals", {
+      affiliate_signup_referral: {
+        affiliate_code: affiliateCode,
+        visitor_id: visitorId,
+      },
+    }),
+
+  recordAffiliateClick: ({ productId, affiliateCode, visitorId, landingUrl, referrerUrl }) =>
+    api.post("/affiliate_clicks", {
+      affiliate_click: {
+        product_id: productId,
+        affiliate_code: affiliateCode,
+        visitor_id: visitorId,
+        landing_url: landingUrl,
+        referrer_url: referrerUrl,
+      },
+    }),
 
   getCart: async () => {
     const response = await api.get("/customer/cart");
