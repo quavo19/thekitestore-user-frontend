@@ -7,6 +7,10 @@ import { ROUTES } from "@/constants";
 import { useCarousel } from "@/hooks/useCarousel";
 import { cn } from "@/utils";
 
+function money(value) {
+  return `GHS ${Number(value || 0).toFixed(2)}`;
+}
+
 export function FeaturedPlantCarousel() {
   const { index, next, prev, goTo } = useCarousel(HERO_FEATURED_PLANTS.length, {
     autoPlayInterval: 6000,
@@ -34,10 +38,10 @@ export function FeaturedPlantCarousel() {
             <div>
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-medium sm:text-2xl">
-                  ${plant.price.toFixed(2)}
+                  {money(plant.price)}
                 </span>
                 <span className="text-xs font-light text-sidebar-muted line-through">
-                  ${plant.originalPrice.toFixed(2)}
+                  {money(plant.originalPrice)}
                 </span>
               </div>
               <Link
