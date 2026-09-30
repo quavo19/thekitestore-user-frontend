@@ -3,8 +3,8 @@ import googleIcon from "@/assets/svgs/Google.svg?raw";
 import heartIcon from "@/assets/svgs/Heart.svg?raw";
 import arrowIcon from "@/assets/svgs/arrow-Up.svg?raw";
 import searchIcon from "@/assets/svgs/Search.svg?raw";
-import profileImage from "@/assets/images/others/profile.avif";
 import { Icon } from "@/components/ui/Icon";
+import { ProfileAvatar } from "@/components/ui/ProfileAvatar";
 import { CartModal } from "@/components/shop/CartModal";
 import { SupportModal } from "@/components/support/SupportModal";
 import { WishlistModal } from "@/components/shop/WishlistModal";
@@ -82,7 +82,7 @@ export function TopBar() {
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
     user?.email ||
     "Plant lover";
-  const avatarSrc = user?.avatar || profileImage;
+  const avatarSrc = isAuthenticated ? user?.avatar : null;
   const bonusBalance = Number(user?.bonus?.balance || 0);
 
   useEffect(() => {
@@ -234,10 +234,11 @@ export function TopBar() {
               onClick={() => setIsProfileMenuOpen((isOpen) => !isOpen)}
               className="flex cursor-pointer items-center gap-2 transition-opacity hover:opacity-80"
             >
-              <img
+              <ProfileAvatar
                 src={avatarSrc}
+                name={displayName}
                 alt="Profile"
-                className="h-8 w-8 rounded-full object-cover"
+                className="h-8 w-8"
               />
               <Icon
                 svg={arrowIcon}
@@ -253,10 +254,11 @@ export function TopBar() {
                 {isAuthenticated ? (
                   <div>
                     <div className="flex items-center gap-3 px-6">
-                      <img
+                      <ProfileAvatar
                         src={avatarSrc}
+                        name={displayName}
                         alt={displayName}
-                        className="h-11 w-11 rounded-full object-cover"
+                        className="h-11 w-11"
                       />
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-ink">
