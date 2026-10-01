@@ -1,11 +1,12 @@
 import whatsappIcon from "@/assets/svgs/WhatsApp.svg?raw";
 import { Icon } from "@/components/ui/Icon";
-import { APP_NAME } from "@/constants";
+import { APP_NAME, ROUTES } from "@/constants";
 import { Link } from "react-router-dom";
 
 const FOOTER_LINKS = [
-  { label: "Terms & Conditions", to: "/terms-and-conditions" },
-  { label: "Refund Policy", to: "/refund-policy" },
+  { label: "Terms & Conditions", to: ROUTES.TERMS },
+  { label: "Refund Policy", to: ROUTES.REFUND_POLICY },
+  { label: "Privacy Policy", to: ROUTES.PRIVACY_POLICY },
 ];
 
 const SOCIAL_LINKS = [

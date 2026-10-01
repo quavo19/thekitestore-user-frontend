@@ -9,6 +9,9 @@ export const ROUTES = {
   ORDER_DETAIL: "/orders/:orderId",
   CHECKOUT: "/checkout",
   PAYMENT_CALLBACK: "/checkout/payment",
+  TERMS: "/terms-and-conditions",
+  REFUND_POLICY: "/refund-policy",
+  PRIVACY_POLICY: "/privacy-policy",
   GOOGLE_AUTH_CALLBACK: "/auth/google/callback",
   NOT_FOUND: "*",
 };

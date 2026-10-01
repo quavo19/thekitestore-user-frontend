@@ -236,8 +236,8 @@ export function TopBar() {
             >
               <ProfileAvatar
                 src={avatarSrc}
-                name={displayName}
-                alt="Profile"
+                name={isAuthenticated ? displayName : ""}
+                alt={isAuthenticated ? "Profile" : "Guest profile"}
                 className="h-8 w-8"
               />
               <Icon
