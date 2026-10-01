@@ -1,42 +1,29 @@
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import cartIcon from "@/assets/svgs/cart.svg?raw";
 import googleIcon from "@/assets/svgs/Google.svg?raw";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Icon } from "@/components/ui/Icon";
 import { SelectDropdown } from "@/components/ui/SelectDropdown";
 import { Spinner } from "@/components/ui/Spinner";
-import { ROUTES } from "@/constants";
+import { APP_NAME, ROUTES } from "@/constants";
 import { getProductById } from "@/constants/products";
 import { useCart } from "@/contexts/CartContext";
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
 import { cn } from "@/utils";
+import {
+  deliveryAddressLine,
+  deliveryZoneRules,
+  normalizeDeliveryZone,
+} from "@/utils/deliveryZones";
 import { getShopReturn } from "@/utils/shopReturn";
-
-const GHANA_REGION_OPTIONS = [
-  "Ahafo",
-  "Ashanti",
-  "Bono",
-  "Bono East",
-  "Central",
-  "Eastern",
-  "Greater Accra",
-  "North East",
-  "Northern",
-  "Oti",
-  "Savannah",
-  "Upper East",
-  "Upper West",
-  "Volta",
-  "Western",
-  "Western North",
-].map((region) => ({ value: region, label: region }));
 
 const emptyAddress = {
   name: "",
   line1: "",
   city: "",
+  town: "",
   region: "",
   country: "Ghana",
   is_default: false,
@@ -52,6 +39,7 @@ function normalizeAddress(record) {
     name: attrs.name || "",
     line1: attrs.address?.line1 || attrs.address?.street || attrs.address?.formatted || "",
     city: attrs.city || "",
+    town: attrs.town || "",
     region: attrs.region || "",
     country: "Ghana",
     is_default: Boolean(attrs.is_default),
@@ -62,6 +50,7 @@ function addressPayload(address) {
   return {
     name: address.name.trim(),
     city: address.city.trim(),
+    town: address.town.trim(),
     region: address.region.trim(),
     country: "Ghana",
     is_default: address.is_default,
@@ -76,8 +65,14 @@ function normalizePhone(phone) {
 }
 
 function splitPhone(phone) {
-  const cleaned = normalizePhone(phone);
-  return cleaned.startsWith("+233") ? cleaned.slice(4) : cleaned;
+  return normalizePhone(phone)
+    .replace(/^\+?233/, "")
+    .replace(/^0+/, "");
+}
+
+function phoneFromLocal(localPhone) {
+  const digits = String(localPhone || "").replace(/\D/g, "").replace(/^0+/, "");
+  return digits ? `+233${digits}` : "+233";
 }
 
 function variantLabel(product) {
@@ -100,7 +95,7 @@ function PhoneField({ value, onChange, onRemove, removable }) {
       </div>
       <input
         value={splitPhone(value)}
-        onChange={(event) => onChange(`+233${event.target.value.replace(/\D/g, "")}`)}
+        onChange={(event) => onChange(phoneFromLocal(event.target.value))}
         inputMode="tel"
         placeholder="Phone number"
         className={cn(fieldClass, "min-w-0 flex-1")}
@@ -124,6 +119,7 @@ export function CheckoutPage() {
   const { user, isAuthenticated, isLoadingUser, startGoogleAuth, fetchCurrentUser } = useUser();
   const { cartItems, itemProducts, clearCart, refreshCart } = useCart();
   const [addresses, setAddresses] = useState([]);
+  const [deliveryZones, setDeliveryZones] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [editingAddressId, setEditingAddressId] = useState(null);
@@ -131,6 +127,7 @@ export function CheckoutPage() {
   const [phones, setPhones] = useState(["+233"]);
   const [isLoadingCheckout, setIsLoadingCheckout] = useState(false);
   const [isPaying, setIsPaying] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -150,6 +147,7 @@ export function CheckoutPage() {
     (total, item) => total + item.product.price * item.quantity,
     0,
   );
+  const addressRules = deliveryZoneRules(deliveryZones, addressForm);
 
   function continueShopping() {
     navigate(getShopReturn());
@@ -184,7 +182,12 @@ export function CheckoutPage() {
       setError("");
       try {
         await refreshCart();
-        const response = await customerService.getAddresses();
+        const [addressesResponse, zonesResponse] = await Promise.all([
+          customerService.getAddresses(),
+          customerService.getDeliveryZones(),
+        ]);
+        setDeliveryZones((zonesResponse?.data || []).map(normalizeDeliveryZone));
+        const response = addressesResponse;
         const nextAddresses = (response?.data || []).map(normalizeAddress);
         setAddresses(nextAddresses);
         const defaultAddress = nextAddresses.find((address) => address.is_default) || nextAddresses[0];
@@ -193,7 +196,7 @@ export function CheckoutPage() {
         const userPhones = Array.isArray(user?.phone_numbers)
           ? user.phone_numbers.filter(Boolean).slice(0, 3)
           : [];
-        setPhones(userPhones.length ? userPhones : ["+233"]);
+        setPhones(userPhones);
       } catch (nextError) {
         setError(nextError.message || "Unable to load checkout details.");
       } finally {
@@ -222,6 +225,18 @@ export function CheckoutPage() {
 
     if (!addressForm.region) {
       setError("Please select a region.");
+      return;
+    }
+    if (addressRules.needsCity && !addressForm.city) {
+      setError("Please select a city.");
+      return;
+    }
+    if (addressRules.needsTown && !addressForm.town) {
+      setError("Please select a town.");
+      return;
+    }
+    if (addressRules.streetAllowed && !addressForm.line1.trim()) {
+      setError("Please enter the street address.");
       return;
     }
 
@@ -272,9 +287,20 @@ export function CheckoutPage() {
     setPhones(next);
   }
 
+  function addPhone() {
+    if (phones.length >= 3) return;
+    setError("");
+    setPhones([...phones, "+233"]);
+  }
+
   async function handlePay() {
     setError("");
     setMessage("");
+
+    if (!termsAccepted) {
+      setError("Please accept the Terms & Conditions and Refund Policy before placing your order.");
+      return;
+    }
 
     const selectedAddress = addresses.find((address) => address.id === selectedAddressId);
     if (!selectedAddress) {
@@ -312,6 +338,7 @@ export function CheckoutPage() {
       const orderResponse = await customerService.createOrder({
         customer_address_id: selectedAddress.id,
         ...(affiliateVisitorId ? { affiliate_visitor_id: affiliateVisitorId } : {}),
+        terms_accepted: true,
         phones: contactPhones,
         order_items: orderItems,
         fulfillments: [...fulfillmentMap.entries()].map(([warehouseId, items]) => ({
@@ -432,7 +459,7 @@ export function CheckoutPage() {
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-hero-dark">{address.name}</p>
                       <p className="mt-1 text-sm font-light text-hero-muted">
-                        {[address.line1, address.city, address.region, "Ghana"].filter(Boolean).join(", ")}
+                        {deliveryAddressLine(address)}
                       </p>
                     </div>
                     <button
@@ -457,17 +484,87 @@ export function CheckoutPage() {
                   </label>
                   <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">
                     Street address
-                    <input value={addressForm.line1} onChange={(event) => setAddressForm({ ...addressForm, line1: event.target.value })} required placeholder="Street address" className={fieldClass} />
+                    <input
+                      value={addressForm.line1}
+                      onChange={(event) => setAddressForm({ ...addressForm, line1: event.target.value })}
+                      required={addressRules.streetAllowed}
+                      disabled={!addressRules.streetAllowed}
+                      placeholder="Street address"
+                      className={cn(fieldClass, !addressRules.streetAllowed && "text-hero-muted opacity-70")}
+                    />
                   </label>
                   <div className="grid gap-3 sm:grid-cols-3">
                     <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">
-                      City
-                      <input value={addressForm.city} onChange={(event) => setAddressForm({ ...addressForm, city: event.target.value })} placeholder="City" className={fieldClass} />
+                      Region
+                      <SelectDropdown
+                        value={addressForm.region}
+                        options={addressRules.regionOptions}
+                        onChange={(region) => setAddressForm({
+                          ...addressForm,
+                          region,
+                          city: "",
+                          town: "",
+                          line1: "",
+                        })}
+                        placeholder="Region"
+                      />
                     </label>
                     <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">
-                      Region
-                      <SelectDropdown value={addressForm.region} options={GHANA_REGION_OPTIONS} onChange={(region) => setAddressForm({ ...addressForm, region })} placeholder="Region" />
+                      City
+                      {addressRules.cityFreeText ? (
+                        <input
+                          value={addressForm.city}
+                          onChange={(event) => setAddressForm({
+                            ...addressForm,
+                            city: event.target.value,
+                            town: "",
+                          })}
+                          placeholder="City"
+                          className={fieldClass}
+                        />
+                      ) : (
+                        <SelectDropdown
+                          value={addressForm.city}
+                          options={addressRules.cityOptions}
+                          disabled={!addressRules.needsCity}
+                          onChange={(city) => setAddressForm({
+                            ...addressForm,
+                            city,
+                            town: "",
+                            line1: "",
+                          })}
+                          placeholder="City"
+                        />
+                      )}
                     </label>
+                    <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">
+                      Town
+                      {addressRules.townFreeText ? (
+                        <input
+                          value={addressForm.town}
+                          onChange={(event) => setAddressForm({
+                            ...addressForm,
+                            town: event.target.value,
+                          })}
+                          placeholder="Town"
+                          className={fieldClass}
+                        />
+                      ) : (
+                        <SelectDropdown
+                          value={addressForm.town}
+                          options={addressRules.townOptions}
+                          disabled={!addressRules.needsTown}
+                          onChange={(town) => setAddressForm({
+                            ...addressForm,
+                            town,
+                            line1: "",
+                          })}
+                          placeholder="Town"
+                        />
+                      )}
+                    </label>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
                     <label className="grid gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">
                       Country
                       <input value="Ghana" disabled className="rounded-2xl bg-hero-sage/30 px-4 py-3 text-sm text-hero-muted outline-none" />
@@ -492,7 +589,14 @@ export function CheckoutPage() {
             <div>
               <div className="flex items-center justify-between">
                 <h2 className="font-serif text-2xl text-hero-dark">Contact numbers</h2>
-                <span className="text-xs text-hero-green">{phones.filter((phone) => normalizePhone(phone) !== "+233").length}/3</span>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-hero-green">{phones.filter((phone) => normalizePhone(phone) !== "+233").length}/3</span>
+                  {phones.length < 3 && (
+                    <button type="button" onClick={addPhone} className="cursor-pointer text-sm font-bold text-hero-green">
+                      Add phone
+                    </button>
+                  )}
+                </div>
               </div>
               <div className="mt-4 space-y-3">
                 {phones.map((phone, index) => (
@@ -500,16 +604,16 @@ export function CheckoutPage() {
                     key={index}
                     value={phone}
                     onChange={(value) => updatePhone(index, value)}
-                    removable={phones.length > 1}
+                    removable
                     onRemove={() => setPhones(phones.filter((_, phoneIndex) => phoneIndex !== index))}
                   />
                 ))}
+                {phones.length === 0 && (
+                  <p className="bg-hero-sage/20 p-4 text-sm font-light text-hero-muted">
+                    Add a contact number for delivery updates.
+                  </p>
+                )}
               </div>
-              {phones.length < 3 && (
-                <button type="button" onClick={() => setPhones([...phones, "+233"])} className="mt-4 cursor-pointer rounded-full border border-hero-green px-5 py-2 text-sm font-medium text-hero-green">
-                  Add phone
-                </button>
-              )}
             </div>
           </section>
 
@@ -539,10 +643,35 @@ export function CheckoutPage() {
               </div>
               <p className="text-xs font-light leading-5 text-hero-muted">Delivery fee is calculated by the order service and included before Paystack payment.</p>
             </div>
+            <label className="mt-5 flex cursor-pointer items-start gap-3 bg-hero-sage/20 p-4 text-xs font-light leading-5 text-hero-muted">
+              <Checkbox
+                checked={termsAccepted}
+                onChange={(event) => {
+                  setTermsAccepted(event.target.checked);
+                  if (event.target.checked) setError("");
+                }}
+                className="mt-0.5 shrink-0"
+              />
+              <span>
+                I have read and agree to the{" "}
+                <Link className="font-semibold text-hero-green underline-offset-2 hover:underline" to={ROUTES.TERMS}>
+                  Terms & Conditions
+                </Link>
+                ,{" "}
+                <Link className="font-semibold text-hero-green underline-offset-2 hover:underline" to={ROUTES.REFUND_POLICY}>
+                  Refund Policy
+                </Link>
+                , and{" "}
+                <Link className="font-semibold text-hero-green underline-offset-2 hover:underline" to={ROUTES.PRIVACY_POLICY}>
+                  Privacy Policy
+                </Link>
+                . I understand refunds are only for faults from the store and that transport breakages after dispatch are not refunded by {APP_NAME}.
+              </span>
+            </label>
             <button
               type="button"
               onClick={handlePay}
-              disabled={isPaying}
+              disabled={isPaying || !termsAccepted}
               className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-hero-green px-5 py-3 text-sm font-medium text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isPaying && <Spinner className="text-white" />}

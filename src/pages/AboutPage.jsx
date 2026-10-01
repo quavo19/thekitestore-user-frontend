@@ -6,7 +6,6 @@ import {
   AboutValues,
 } from "@/components/about/AboutContentSections";
 import { AboutWhyChooseUs } from "@/components/about/AboutWhyChooseUs";
-import { Footer } from "@/components/layout/Footer";
 
 export function AboutPage() {
   return (
@@ -17,7 +16,6 @@ export function AboutPage() {
       <AboutMissionVision />
       <AboutValues />
       <AboutServices />
-      <Footer />
     </div>
   );
 }
