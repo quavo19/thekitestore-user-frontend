@@ -9,30 +9,11 @@ import { ROUTES } from "@/constants";
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
 import { cn } from "@/utils";
-
-const GHANA_REGIONS = [
-  "Ahafo",
-  "Ashanti",
-  "Bono",
-  "Bono East",
-  "Central",
-  "Eastern",
-  "Greater Accra",
-  "North East",
-  "Northern",
-  "Oti",
-  "Savannah",
-  "Upper East",
-  "Upper West",
-  "Volta",
-  "Western",
-  "Western North",
-];
-
-const GHANA_REGION_OPTIONS = GHANA_REGIONS.map((region) => ({
-  value: region,
-  label: region,
-}));
+import {
+  deliveryAddressLine,
+  deliveryZoneRules,
+  normalizeDeliveryZone,
+} from "@/utils/deliveryZones";
 
 const PHONE_CODE_OPTIONS = [{ value: "+233", label: "+233" }];
 
@@ -46,6 +27,7 @@ const emptyAddress = {
   name: "",
   line1: "",
   city: "",
+  town: "",
   region: "",
   country: "Ghana",
   is_default: false,
@@ -62,6 +44,7 @@ function normalizeAddress(record) {
       attrs.address?.formatted ||
       "",
     city: attrs.city || "",
+    town: attrs.town || "",
     region: attrs.region || "",
     country: attrs.country || "Ghana",
     is_default: Boolean(attrs.is_default),
@@ -72,6 +55,7 @@ function addressPayload(address) {
   return {
     name: address.name.trim(),
     city: address.city.trim(),
+    town: address.town.trim(),
     region: address.region.trim(),
     country: "Ghana",
     is_default: address.is_default,
@@ -82,12 +66,18 @@ function addressPayload(address) {
 }
 
 function splitPhone(phone) {
-  const cleaned = String(phone || "").replace(/\s+/g, "");
-  return cleaned.startsWith("+233") ? cleaned.slice(4) : cleaned;
+  return normalizePhone(phone)
+    .replace(/^\+?233/, "")
+    .replace(/^0+/, "");
 }
 
 function normalizePhone(phone) {
   return String(phone || "").replace(/\s+/g, "");
+}
+
+function phoneFromLocal(localPhone) {
+  const digits = String(localPhone || "").replace(/\D/g, "").replace(/^0+/, "");
+  return digits ? `+233${digits}` : "+233";
 }
 
 function hasDuplicatePhone(phones, nextPhone, index) {
@@ -114,7 +104,7 @@ function PhoneNumberInput({ value, disabled, onChange }) {
       <input
         value={splitPhone(value)}
         disabled={disabled}
-        onChange={(event) => onChange(`+233${event.target.value.replace(/\D/g, "")}`)}
+        onChange={(event) => onChange(phoneFromLocal(event.target.value))}
         inputMode="tel"
         placeholder="Phone number"
         className="min-w-0 flex-1 rounded-2xl bg-hero-sage/40 px-4 py-3 text-sm text-ink outline-none transition-colors focus:bg-hero-sage/60 disabled:text-hero-muted"
@@ -144,6 +134,7 @@ export function ProfilePage() {
   const [profileDraft, setProfileDraft] = useState(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [addresses, setAddresses] = useState([]);
+  const [deliveryZones, setDeliveryZones] = useState([]);
   const [addressForm, setAddressForm] = useState(emptyAddress);
   const [editingAddressId, setEditingAddressId] = useState(null);
   const [isAddingAddress, setIsAddingAddress] = useState(false);
@@ -163,10 +154,11 @@ export function ProfilePage() {
     : [];
   const firstName = profileDraft?.firstName ?? user?.first_name ?? "";
   const lastName = profileDraft?.lastName ?? user?.last_name ?? "";
-  const phones = profileDraft?.phones ?? (userPhones.length ? userPhones : [""]);
+  const phones = profileDraft?.phones ?? userPhones;
   const canAddPhone = phones.length < 3;
   const canCreateAddress = addresses.length < 3;
   const isEditingAddress = Boolean(editingAddressId || isAddingAddress);
+  const addressRules = deliveryZoneRules(deliveryZones, addressForm);
   const defaultAddress = useMemo(
     () => addresses.find((address) => address.is_default) || addresses[0],
     [addresses],
@@ -181,15 +173,26 @@ export function ProfilePage() {
     });
   }
 
+  function startAddPhone() {
+    if (!canAddPhone) return;
+    updateProfileDraft({ phones: [...phones, "+233"] });
+    setIsEditingProfile(true);
+  }
+
   async function refreshAddresses() {
     const response = await customerService.getAddresses();
     setAddresses((response?.data || []).map(normalizeAddress));
   }
 
+  async function refreshDeliveryZones() {
+    const response = await customerService.getDeliveryZones();
+    setDeliveryZones((response?.data || []).map(normalizeDeliveryZone));
+  }
+
   useEffect(() => {
     if (!isAuthenticated) return undefined;
     const timer = window.setTimeout(() => {
-      refreshAddresses().catch((nextError) => {
+      Promise.all([refreshAddresses(), refreshDeliveryZones()]).catch((nextError) => {
         setError(nextError.message || "Unable to load your addresses.");
       });
     }, 0);
@@ -212,7 +215,10 @@ export function ProfilePage() {
     setMessage("");
 
     try {
-      const nextPhones = phones.map(normalizePhone).filter(Boolean).slice(0, 3);
+      const nextPhones = phones
+        .map(normalizePhone)
+        .filter((phone) => phone && phone !== "+233")
+        .slice(0, 3);
       if (new Set(nextPhones).size !== nextPhones.length) {
         setError("Phone numbers cannot be duplicated.");
         return;
@@ -242,6 +248,18 @@ export function ProfilePage() {
     try {
       if (!addressForm.region) {
         setError("Please select a region.");
+        return;
+      }
+      if (addressRules.needsCity && !addressForm.city) {
+        setError("Please select a city.");
+        return;
+      }
+      if (addressRules.needsTown && !addressForm.town) {
+        setError("Please select a town.");
+        return;
+      }
+      if (addressRules.streetAllowed && !addressForm.line1.trim()) {
+        setError("Please enter the street address.");
         return;
       }
 
@@ -370,9 +388,7 @@ export function ProfilePage() {
             </p>
             <p className="mt-1 text-sm font-light leading-6 text-hero-muted">
               {defaultAddress
-                ? [defaultAddress.line1, defaultAddress.city, defaultAddress.region, "Ghana"]
-                    .filter(Boolean)
-                    .join(", ")
+                ? deliveryAddressLine(defaultAddress)
                 : "Add an address below so checkout can move faster."}
             </p>
             </div>
@@ -400,13 +416,15 @@ export function ProfilePage() {
                 Keep your contact details ready for orders.
               </p>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsEditingProfile(true)}
-              className="cursor-pointer text-sm font-bold text-hero-green"
-            >
-              Edit
-            </button>
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setIsEditingProfile(true)}
+                className="cursor-pointer text-sm font-bold text-hero-green"
+              >
+                Edit profile
+              </button>
+            </div>
           </div>
 
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -431,7 +449,20 @@ export function ProfilePage() {
           <div className="mt-6 space-y-3">
             <div className="flex items-center justify-between">
               <p className="text-sm font-light text-hero-muted">Phone numbers</p>
-              <span className="text-xs text-hero-green">{phones.filter(Boolean).length}/3</span>
+              <div className="flex items-center gap-3">
+                <span className="text-xs text-hero-green">
+                  {phones.filter((phone) => normalizePhone(phone) !== "+233").length}/3
+                </span>
+                {canAddPhone && !isEditingProfile && (
+                  <button
+                    type="button"
+                    onClick={startAddPhone}
+                    className="cursor-pointer text-sm font-bold text-hero-green"
+                  >
+                    Add phone
+                  </button>
+                )}
+              </div>
             </div>
             {phones.map((phone, index) => (
               <div key={index} className="flex gap-2">
@@ -465,6 +496,11 @@ export function ProfilePage() {
                 )}
               </div>
             ))}
+            {phones.length === 0 && (
+              <p className="bg-hero-sage/20 p-4 text-sm font-light text-hero-muted">
+                No phone numbers saved yet.
+              </p>
+            )}
           </div>
 
           {isEditingProfile && (
@@ -472,7 +508,7 @@ export function ProfilePage() {
               <button
                 type="button"
                 disabled={!canAddPhone}
-                onClick={() => updateProfileDraft({ phones: [...phones, "+233"] })}
+                onClick={startAddPhone}
                 className="cursor-pointer rounded-full border border-hero-green px-5 py-2 text-sm font-medium text-hero-green transition-colors hover:bg-hero-green/5 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Add phone
@@ -512,7 +548,7 @@ export function ProfilePage() {
                 onClick={startAddressCreate}
                 className="cursor-pointer text-sm font-bold text-hero-green"
               >
-                Edit
+                Add
               </button>
             )}
           </div>
@@ -523,11 +559,7 @@ export function ProfilePage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="font-medium text-hero-dark">{address.name}</p>
-                    <p className="mt-1 text-sm font-light leading-6 text-hero-muted">
-                      {[address.line1, address.city, address.region, "Ghana"]
-                        .filter(Boolean)
-                        .join(", ")}
-                    </p>
+                    <p className="mt-1 text-sm font-light leading-6 text-hero-muted">{deliveryAddressLine(address)}</p>
                   </div>
                   {address.is_default && (
                     <span className="bg-white px-3 py-1 text-xs text-hero-green">Default</span>
@@ -574,23 +606,72 @@ export function ProfilePage() {
               <input
                 value={addressForm.line1}
                 onChange={(event) => setAddressForm({ ...addressForm, line1: event.target.value })}
-                required
+                required={addressRules.streetAllowed}
+                disabled={!addressRules.streetAllowed}
                 placeholder="Street address"
-                className={addressInputClassName}
+                className={cn(addressInputClassName, !addressRules.streetAllowed && "text-hero-muted opacity-70")}
               />
-              <div className="grid gap-3 sm:grid-cols-3">
-                <input
-                  value={addressForm.city}
-                  onChange={(event) => setAddressForm({ ...addressForm, city: event.target.value })}
-                  placeholder="City"
-                  className={addressInputClassName}
-                />
+              <div className="grid gap-3 sm:grid-cols-2">
                 <SelectDropdown
                   value={addressForm.region}
-                  options={GHANA_REGION_OPTIONS}
-                  onChange={(region) => setAddressForm({ ...addressForm, region })}
+                  options={addressRules.regionOptions}
+                  onChange={(region) => setAddressForm({
+                    ...addressForm,
+                    region,
+                    city: "",
+                    town: "",
+                    line1: "",
+                  })}
                   placeholder="Region"
                 />
+                {addressRules.cityFreeText ? (
+                  <input
+                    value={addressForm.city}
+                    onChange={(event) => setAddressForm({
+                      ...addressForm,
+                      city: event.target.value,
+                      town: "",
+                    })}
+                    placeholder="City"
+                    className={addressInputClassName}
+                  />
+                ) : (
+                  <SelectDropdown
+                    value={addressForm.city}
+                    options={addressRules.cityOptions}
+                    disabled={!addressRules.needsCity}
+                    onChange={(city) => setAddressForm({
+                      ...addressForm,
+                      city,
+                      town: "",
+                      line1: "",
+                    })}
+                    placeholder="City"
+                  />
+                )}
+                {addressRules.townFreeText ? (
+                  <input
+                    value={addressForm.town}
+                    onChange={(event) => setAddressForm({
+                      ...addressForm,
+                      town: event.target.value,
+                    })}
+                    placeholder="Town"
+                    className={addressInputClassName}
+                  />
+                ) : (
+                  <SelectDropdown
+                    value={addressForm.town}
+                    options={addressRules.townOptions}
+                    disabled={!addressRules.needsTown}
+                    onChange={(town) => setAddressForm({
+                      ...addressForm,
+                      town,
+                      line1: "",
+                    })}
+                    placeholder="Town"
+                  />
+                )}
                 <input
                   value="Ghana"
                   disabled
