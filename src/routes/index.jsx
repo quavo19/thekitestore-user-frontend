@@ -11,6 +11,11 @@ import { OrderDetailPage } from "@/pages/OrderDetailPage";
 import { ProfilePage } from "@/pages/ProfilePage";
 import { ProductDetailPage } from "@/pages/ProductDetailPage";
 import { ShopPage } from "@/pages/ShopPage";
+import {
+  PrivacyPolicyPage,
+  RefundPolicyPage,
+  TermsAndConditionsPage,
+} from "@/pages/LegalPages";
 
 export const routes = [
   {
@@ -26,6 +31,9 @@ export const routes = [
       { path: ROUTES.ORDER_DETAIL, element: <OrderDetailPage /> },
       { path: ROUTES.CHECKOUT, element: <CheckoutPage /> },
       { path: ROUTES.PAYMENT_CALLBACK, element: <CheckoutPage /> },
+      { path: ROUTES.TERMS, element: <TermsAndConditionsPage /> },
+      { path: ROUTES.REFUND_POLICY, element: <RefundPolicyPage /> },
+      { path: ROUTES.PRIVACY_POLICY, element: <PrivacyPolicyPage /> },
       { path: ROUTES.GOOGLE_AUTH_CALLBACK, element: <GoogleAuthCallbackPage /> },
       { path: ROUTES.NOT_FOUND, element: <NotFoundPage /> },
     ],

@@ -230,6 +230,7 @@ export const customerService = {
   removeFromWishlist: (productId) => api.delete(`/customer/wishlist/${productId}`),
 
   getAddresses: () => api.get("/customer/addresses"),
+  getDeliveryZones: () => api.get("/customer/delivery_zones"),
   createAddress: (address) => api.post("/customer/addresses", { address }),
   updateAddress: (id, address) => api.patch(`/customer/addresses/${id}`, { address }),
   deleteAddress: (id) => api.delete(`/customer/addresses/${id}`),
