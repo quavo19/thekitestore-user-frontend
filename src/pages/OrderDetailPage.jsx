@@ -52,6 +52,7 @@ function addressText(addressRecord) {
     address.line1,
     address.street,
     address.formatted,
+    attrs.town,
     attrs.city,
     attrs.region,
     attrs.country || "Ghana",
