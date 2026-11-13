@@ -33,7 +33,7 @@ export function WishlistModal() {
               </p>
             )}
             <p className="mb-4 text-sm font-light text-hero-muted">
-              {count} {count === 1 ? "plant" : "plants"} saved
+              {count} {count === 1 ? "product" : "products"} saved
             </p>
             <div className="modal-item-list grid grid-cols-2 gap-4">
               {wishlistedProducts.map((product) => (
@@ -51,7 +51,7 @@ export function WishlistModal() {
               Your wishlist is empty
             </p>
             <p className="mt-2 text-sm font-light text-hero-muted">
-              Tap the heart on any plant to save it here.
+              Tap the heart on any product to save it here.
             </p>
           </div>
         )}

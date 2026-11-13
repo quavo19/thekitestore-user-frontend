@@ -137,7 +137,7 @@ export function ItemsCarousel({
             {viewAllHref && (
               <Link
                 to={viewAllHref}
-                className="inline-flex cursor-pointer rounded-full border border-gray-200 px-3 py-1 text-[11px] font-light text-hero-dark transition-colors hover:bg-gray-50"
+                className="inline-flex cursor-pointer rounded-full border border-gray-200 px-3 py-1 text-xs font-light text-hero-dark transition-colors hover:bg-gray-50"
               >
                 {viewAllLabel}
               </Link>

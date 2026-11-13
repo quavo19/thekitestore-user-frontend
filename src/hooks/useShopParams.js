@@ -256,7 +256,7 @@ export function useShopParams(products = DUMMY_PRODUCTS, options = {}) {
 
     if (params.categories.length) {
       results = results.filter((product) =>
-        params.categories.includes(product.category),
+        params.categories.some(category => category === product.category || product.categoryIds?.includes(category)),
       );
     }
 
@@ -278,7 +278,7 @@ export function useShopParams(products = DUMMY_PRODUCTS, options = {}) {
     const priceMax = Math.max(params.priceMin, params.priceMax);
 
     results = results.filter(
-      (product) => product.price >= priceMin && product.price <= priceMax,
+      (product) => (params.priceMin === SHOP_PRICE_RANGE.min || product.price >= priceMin) && (params.priceMax === SHOP_PRICE_RANGE.max || product.price <= priceMax),
     );
 
     switch (params.sort) {

@@ -1,41 +1,6 @@
-import plant1 from "@/assets/images/plants/plant1.png";
-import plant2 from "@/assets/images/plants/plant2.png";
-import plant3 from "@/assets/images/plants/plant3.jpg";
-import plant4 from "@/assets/images/plants/plant4.jpg";
-
-export const SHOP_CATEGORIES = [
-  { id: "rattan-pots", label: "Rattan pots" },
-  { id: "plant-stands", label: "Plant stands" },
-  { id: "propagation-jars", label: "Propagation jars" },
-  { id: "gardening-tool-kit", label: "Gardening tool kit" },
-];
-
-export const SHOP_MAIN_CATEGORIES = [
-  {
-    id: "rattan-pots",
-    label: "Rattan pots",
-    count: 52,
-    image: plant1,
-  },
-  {
-    id: "plant-stands",
-    label: "Plant stands",
-    count: 38,
-    image: plant2,
-  },
-  {
-    id: "propagation-jars",
-    label: "Propagation jars",
-    count: 44,
-    image: plant3,
-  },
-  {
-    id: "gardening-tool-kit",
-    label: "Gardening tool kit",
-    count: 66,
-    image: plant4,
-  },
-];
+import { CATALOG_CATEGORIES } from "./catalog";
+export const SHOP_CATEGORIES = CATALOG_CATEGORIES;
+export const SHOP_MAIN_CATEGORIES = CATALOG_CATEGORIES;
 
 export const SHOP_SIZES = [
   { id: "small", label: "Small" },
@@ -67,8 +32,8 @@ export const SHOP_CATALOG_PAGE_SIZE = 10;
 
 export const SHOP_PRICE_RANGE = {
   min: 0,
-  max: 500,
-  step: 5,
+  max: 100000,
+  step: 50,
 };
 
 export const SHOP_SEARCH_PARAM = "search";

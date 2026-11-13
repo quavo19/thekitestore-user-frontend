@@ -6,15 +6,16 @@ function money(value) {
   return `GHS ${Number(value || 0).toFixed(2)}`;
 }
 
-export function ProductCarouselCard({ name, price, rating, image, href }) {
+export function ProductCarouselCard({ name, price, rating, image, href, demo = false }) {
   return (
     <Link to={href} className="group flex h-full flex-col cursor-pointer">
       <div className="relative flex-1">
         <div className="relative h-36 overflow-hidden rounded-2xl bg-gray-50 transition-colors group-hover:bg-gray-100/80 sm:h-40">
+          {demo && <span className="absolute left-2 top-2 z-10 rounded-full bg-white px-2 py-1 text-xs font-semibold text-hero-dark">Sample listing</span>}
           <img
             src={image}
             alt={name}
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-contain object-center p-3"
           />
         </div>
 
@@ -22,18 +23,18 @@ export function ProductCarouselCard({ name, price, rating, image, href }) {
           <p className="truncate text-xs font-semibold text-hero-dark">{name}</p>
 
           <div className="mt-1 flex items-center gap-2">
-            <span className="text-[11px] font-light text-hero-dark">
+            <span className="text-xs font-light text-hero-dark">
               {money(price)}
             </span>
-            <span className="flex items-center gap-0.5 text-[11px] font-light text-hero-muted">
+            <span className="flex items-center gap-0.5 text-xs font-light text-hero-muted">
               {rating}
-              <span className="text-[10px] text-hero-green">★</span>
+              <span className="text-xs text-hero-green">★</span>
             </span>
           </div>
 
-          <span className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime text-hero-dark transition-opacity group-hover:opacity-90">
+          {!demo && <span className="absolute bottom-2 right-2 inline-flex h-7 w-7 items-center justify-center rounded-full bg-accent-lime text-hero-dark transition-opacity group-hover:opacity-90">
             <Icon svg={bagIcon} className="h-3.5 w-3.5" />
-          </span>
+          </span>}
         </div>
       </div>
     </Link>

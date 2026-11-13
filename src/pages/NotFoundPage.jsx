@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
 import bagIcon from "@/assets/svgs/Bag.svg?raw";
 import heartIcon from "@/assets/svgs/Heart.svg?raw";
-import leavesIcon from "@/assets/svgs/leaves.svg?raw";
 import searchIcon from "@/assets/svgs/Search.svg?raw";
-import plantImage from "@/assets/images/plants/plant2.png";
+const deviceImage = "/catalog/macbooks.svg";
 import { Icon } from "@/components/ui/Icon";
 import { ROUTES } from "@/constants";
 
@@ -12,13 +11,13 @@ export function NotFoundPage() {
     <section className="mx-auto grid min-h-[72vh] max-w-6xl items-center gap-10 bg-white px-5 py-8 sm:px-8 lg:grid-cols-[0.95fr_1.05fr]">
       <div className="relative min-h-[360px] overflow-hidden bg-hero-sage/20">
         <span className="absolute left-6 top-6 flex h-16 w-16 items-center justify-center bg-white text-hero-green">
-          <Icon svg={leavesIcon} className="h-8 w-8" />
+          <Icon svg={bagIcon} className="h-8 w-8" />
         </span>
         <span className="absolute right-7 top-10 flex h-11 w-11 items-center justify-center bg-hero-green text-white">
           <Icon svg={heartIcon} className="h-5 w-5" />
         </span>
         <img
-          src={plantImage}
+          src={deviceImage}
           alt=""
           className="absolute bottom-0 left-1/2 h-[88%] max-h-[480px] -translate-x-1/2 object-contain"
         />
@@ -38,7 +37,7 @@ export function NotFoundPage() {
           Page not found
         </p>
         <h1 className="mt-4 font-serif text-5xl leading-tight text-hero-dark sm:text-6xl">
-          This plant shelf is empty.
+          Nothing here just yet.
         </h1>
         <p className="mt-5 text-sm font-light leading-7 text-hero-muted sm:text-base">
           The page may have moved, or the link may be wrong. Head back to the shop

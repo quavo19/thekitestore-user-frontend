@@ -7,6 +7,7 @@ import { Spinner } from "@/components/ui/Spinner";
 import { ROUTES } from "@/constants";
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
+import { displayText } from "@/utils/displayText";
 import { cn } from "@/utils";
 
 function money(value) {
@@ -496,7 +497,7 @@ export function OrderDetailPage() {
                   {imageUrl(item) ? (
                     <img
                       src={imageUrl(item)}
-                      alt={itemAttrs.product_name || "Order item"}
+                      alt={displayText(itemAttrs.product_name || "Order item")}
                       className="h-full w-full object-contain"
                     />
                   ) : (
@@ -507,7 +508,7 @@ export function OrderDetailPage() {
                 </div>
                 <div className="p-5">
                   <p className="font-serif text-2xl text-hero-dark">
-                    {itemAttrs.product_name || "Product"}
+                    {displayText(itemAttrs.product_name || "Product")}
                   </p>
                   {optionsText && (
                     <p className="mt-2 text-sm font-light leading-6 text-hero-muted">
@@ -552,7 +553,7 @@ export function OrderDetailPage() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-hero-green">Review item</p>
                 <h2 className="mt-2 font-serif text-3xl text-hero-dark">
-                  {reviewItem.attributes?.product_name || "Product"}
+                  {displayText(reviewItem.attributes?.product_name || "Product")}
                 </h2>
                 {variantOptionsText(reviewItem.attributes?.snapshot?.variant_stock_option_names) && (
                   <p className="mt-2 text-sm font-light text-hero-muted">

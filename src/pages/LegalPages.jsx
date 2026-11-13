@@ -1,6 +1,6 @@
 import { APP_NAME } from "@/constants";
 
-const UPDATED_AT = "September 30, 2026";
+const UPDATED_AT = "November 13, 2026";
 const CONTACT_PHONE = "+233 50 133 39";
 const CONTACT_WHATSAPP = "https://wa.me/2335013339";
 
@@ -59,7 +59,7 @@ export function TermsAndConditionsPage() {
     >
       <PolicySection title="Store Information">
         <p>
-          {APP_NAME} sells plants, plant care items, and related products online in Ghana.
+          {APP_NAME} sells electronics and accessories online in Ghana. We are an independent retailer, not an Apple Authorized Reseller, and are not affiliated with, sponsored by, or endorsed by Apple Inc. Apple product names are trademarks of Apple Inc. and identify the products offered.
           For order help, product questions, complaints, or policy requests, contact us on
           WhatsApp or phone at{" "}
           <a className="font-medium text-hero-green" href={CONTACT_WHATSAPP} target="_blank" rel="noopener noreferrer">
@@ -82,16 +82,14 @@ export function TermsAndConditionsPage() {
 
       <PolicySection title="Product Condition">
         <p>
-          We inspect items before dispatch and aim to send products in good condition. Natural
-          products such as plants may vary in size, shape, colour, leaf count, and appearance.
-          These natural differences are not faults.
+          Product condition, model, storage, colour, included accessories and applicable warranty are described in each listing. Review these details before ordering. Manufacturer warranty coverage is not implied by our use of a product name.
         </p>
       </PolicySection>
 
       <PolicySection title="Delivery and Transport Risk">
         <PolicyList
           items={[
-            "After an order leaves our store or is handed to a delivery rider, courier, transport provider, or customer-arranged pickup, the risk of breakage, loss, delay, heat stress, mishandling, or transit damage passes to the customer.",
+            "After an order leaves our store or is handed to a delivery rider, courier, transport provider, or customer-arranged pickup, the risk of breakage, loss, delay, mishandling, or transit damage passes to the customer.",
             "We do not refund or replace items broken, damaged, delayed, or mishandled during transport after dispatch, unless the issue was caused by a fault from our store before dispatch.",
             "Please inspect your order immediately on delivery or pickup and report any store fault as soon as possible with clear photos or video.",
           ]}
@@ -172,8 +170,8 @@ export function RefundPolicyPage() {
         <PolicyList
           items={[
             "Damage, breakage, or delay during delivery or transport after dispatch.",
-            "Damage caused by poor handling, poor care, weather exposure, heat, overwatering, underwatering, or unsuitable placement after delivery.",
-            "Natural plant variation, including leaf shape, leaf count, size, colour tone, minor blemishes, or growth pattern.",
+            "Damage caused by misuse, liquid exposure, accidental impact, or unauthorised modification after delivery.",
+            "Cosmetic wear explicitly disclosed in the listing for a used or refurbished device.",
             "Change of mind after the order has been prepared, packed, dispatched, or specially sourced.",
           ]}
         />

@@ -49,10 +49,10 @@ function HeroFeatureItem({ icon, iconBg, title, description, className }) {
       </div>
 
       <div className="min-w-0">
-        <p className="text-[13px] font-semibold leading-snug text-hero-dark">
+        <p className="text-sm font-semibold leading-snug text-hero-dark">
           {title}
         </p>
-        <p className="mt-0.5 text-[12px] font-light leading-relaxed text-hero-muted">
+        <p className="mt-0.5 text-xs font-light leading-relaxed text-hero-muted">
           {description}
         </p>
       </div>

@@ -21,12 +21,13 @@ export function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="-mx-4 -mb-6 mt-10 bg-sidebar px-6 py-8 text-sidebar-muted sm:mt-12 lg:-mx-8 lg:-mb-8 lg:px-10">
+    <footer className="relative -mx-4 -mb-6 mt-10 bg-white px-6 py-8 text-gray-600 sm:mt-12 lg:-mx-8 lg:-mb-8 lg:px-10">
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-6 top-0 h-px bg-gray-200 lg:inset-x-10" />
       <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="font-serif text-lg text-white">{APP_NAME}</p>
+          <p className="font-serif text-lg text-gray-900">{APP_NAME}</p>
           <p className="mt-1 text-sm font-light">
-            Beautiful plants. Expert care. Delivered to your door.
+            Your devices. Your workspace. Your everyday, upgraded.
           </p>
         </div>
 
@@ -39,7 +40,7 @@ export function Footer() {
               <Link
                 key={item.to}
                 to={item.to}
-                className="transition-colors hover:text-white"
+                className="transition-colors hover:text-gray-950"
               >
                 {item.label}
               </Link>
@@ -54,7 +55,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={item.label}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sidebar-card transition-colors hover:bg-sidebar-active"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-black text-white transition-colors hover:bg-gray-800"
               >
                 <Icon svg={item.icon} className="h-4 w-4" />
               </a>
@@ -63,7 +64,8 @@ export function Footer() {
         </div>
       </div>
 
-      <p className="mt-6 border-t border-sidebar-active pt-5 text-xs font-light text-sidebar-muted/80">
+      <p className="mt-6 max-w-3xl text-xs leading-relaxed">The Kite Store is an independent retailer, not an Apple Authorized Reseller. We are not affiliated with, sponsored by, or endorsed by Apple Inc. Apple, iPhone, iPad, Mac, AirPods and other Apple product names are trademarks of Apple Inc. and are used to identify products.</p>
+      <p className="mt-6 border-t border-gray-200 pt-5 text-xs font-light text-gray-600">
         © {year} {APP_NAME}. All rights reserved.
       </p>
     </footer>

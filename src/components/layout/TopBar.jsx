@@ -81,7 +81,7 @@ export function TopBar() {
   const displayName =
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
     user?.email ||
-    "Plant lover";
+    "Kite customer";
   const avatarSrc = isAuthenticated ? user?.avatar : null;
   const bonusBalance = Number(user?.bonus?.balance || 0);
 
@@ -174,7 +174,7 @@ export function TopBar() {
             type="search"
             name="query"
             defaultValue={query}
-            placeholder="Search plants, care tips, accessories..."
+            placeholder="Search devices, models, accessories..."
             onFocus={handleSearchFocus}
             onBlur={handleSearchBlur}
             onChange={handleSearchChange}
@@ -373,7 +373,7 @@ export function TopBar() {
                         type="button"
                         className="block cursor-pointer py-1 text-left text-sm font-light text-hero-muted hover:text-ink"
                       >
-                        Plant care rewards
+                        Shopping rewards
                       </button>
                     </div>
 

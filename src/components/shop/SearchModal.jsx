@@ -1,3 +1,5 @@
+import { useCustomerProducts } from "@/hooks/useCustomerProducts";
+import { useSearchParams } from "react-router-dom";
 import closeIcon from "@/assets/svgs/Close.svg?raw";
 import searchIcon from "@/assets/svgs/Search.svg?raw";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
@@ -11,6 +13,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 export function SearchModal() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { products } = useCustomerProducts(searchParams.get("query") || "");
   const { pathname } = useLocation();
   const isShopPage = pathname === ROUTES.SHOP;
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -36,7 +40,7 @@ export function SearchModal() {
     setQuery,
     applyFilters,
     clearFilters,
-  } = useShopParams();
+  } = useShopParams(products);
 
   useEffect(() => {
     if (isSearchOpen) {
@@ -87,7 +91,7 @@ export function SearchModal() {
                 type="search"
                 key={query}
                 defaultValue={query}
-                placeholder="Search plants, care tips, accessories..."
+                placeholder="Search devices, models, accessories..."
                 className="w-full rounded-xl border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm font-light text-ink outline-none transition-all duration-300 focus:border-hero-green sm:focus:max-w-none"
               />
             </form>

@@ -1,21 +1,4 @@
-import { AboutHero } from "@/components/about/AboutHero";
-import {
-  AboutMissionVision,
-  AboutOverview,
-  AboutServices,
-  AboutValues,
-} from "@/components/about/AboutContentSections";
-import { AboutWhyChooseUs } from "@/components/about/AboutWhyChooseUs";
-
+import { Link } from "react-router-dom";
 export function AboutPage() {
-  return (
-    <div className="space-y-16 pb-4 sm:space-y-20 sm:pb-6">
-      <AboutHero />
-      <AboutWhyChooseUs />
-      <AboutOverview />
-      <AboutMissionVision />
-      <AboutValues />
-      <AboutServices />
-    </div>
-  );
+  return <div className="mx-auto max-w-4xl py-8 text-ink"><span className="eyebrow text-hero-green">MEET THE KITE STORE</span><h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-6xl">Good tech.<br />More possibilities.</h1><p className="mt-8 max-w-2xl text-base leading-8 text-hero-muted">We are an independent electronics retailer in Ghana, bringing together Apple devices and the accessories that make them part of your everyday. From an iPhone for your pocket to a Mac for your workspace, explore the ecosystem in one place.</p><div className="my-10 grid gap-6 sm:grid-cols-3">{[["Your pocket", "Phones, AirPods, watches and AirTags."], ["Your workspace", "MacBooks, desktops, displays, keyboards and mice."], ["Your everyday", "iPads, chargers, cases, home audio and more."]].map(([title, description]) => <div key={title} className="rounded-2xl bg-hero-sage/40 p-6"><h2 className="font-semibold">{title}</h2><p className="mt-3 text-sm leading-7 text-hero-muted">{description}</p></div>)}</div><section className="rounded-2xl border border-hero-sage p-7"><h2 className="text-xl font-semibold">Independent, and clear about it.</h2><p className="mt-4 text-sm leading-7 text-hero-muted">The Kite Store is not an Apple Authorized Reseller and is not affiliated with, sponsored by, or endorsed by Apple Inc. Product names and trademarks belong to their respective owners and are used to identify products. Product condition, included accessories and any applicable warranty are specified in each listing; availability varies by model.</p></section><Link to="/shop" className="store-button mt-8">Explore the collection ↗</Link></div>;
 }

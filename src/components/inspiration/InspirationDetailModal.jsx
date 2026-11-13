@@ -57,7 +57,7 @@ function SingleImageView({ board, activeIndex, onIndexChange }) {
         <img
           key={`${board.id}-${activeIndex}`}
           src={image}
-          alt={`${board.title} — photo ${activeIndex + 1}`}
+          alt={`${board.title}, photo ${activeIndex + 1}`}
           className="max-h-[58svh] w-full max-w-full rounded-xl object-contain"
         />
 
@@ -120,7 +120,7 @@ function GridView({ board, onImageSelect }) {
           >
             <img
               src={image}
-              alt={`${board.title} — photo ${index + 1}`}
+              alt={`${board.title}, photo ${index + 1}`}
               className="w-full rounded-xl object-cover transition-opacity group-hover:opacity-90"
             />
           </button>

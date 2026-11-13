@@ -1,3 +1,4 @@
+import { useCategories } from "@/hooks/useCategories";
 import { useEffect } from "react";
 import { SideModal } from "@/components/ui/SideModal";
 import {
@@ -9,11 +10,8 @@ import {
 import { PriceRangeSlider } from "@/components/shop/PriceRangeSlider";
 import {
   SHOP_AVAILABILITY,
-  SHOP_CATEGORIES,
   SHOP_PRICE_RANGE,
-  SHOP_SIZES,
   SHOP_SORT_OPTIONS,
-  SHOP_STYLES,
 } from "@/constants/shop";
 
 export function FilterModal({
@@ -23,12 +21,11 @@ export function FilterModal({
   onApply,
   onClear,
 }) {
+  const catalogCategories = useCategories();
   const {
     filters,
     toggleCategory,
-    toggleSize,
     toggleAvailability,
-    toggleStyle,
     setSort,
     setPriceRange,
     reset,
@@ -85,23 +82,12 @@ export function FilterModal({
     >
       <div className="px-5">
         <FilterSection title="Categories">
-          {SHOP_CATEGORIES.map((category) => (
+          {catalogCategories.map((category) => (
             <FilterCheckbox
               key={category.id}
               label={category.label}
               checked={filters.categories.includes(category.id)}
               onChange={() => toggleCategory(category.id)}
-            />
-          ))}
-        </FilterSection>
-
-        <FilterSection title="Size & dimensions">
-          {SHOP_SIZES.map((size) => (
-            <FilterCheckbox
-              key={size.id}
-              label={size.label}
-              checked={filters.sizes.includes(size.id)}
-              onChange={() => toggleSize(size.id)}
             />
           ))}
         </FilterSection>
@@ -113,17 +99,6 @@ export function FilterModal({
               label={option.label}
               checked={filters.availability.includes(option.id)}
               onChange={() => toggleAvailability(option.id)}
-            />
-          ))}
-        </FilterSection>
-
-        <FilterSection title="Style & Design" defaultOpen={false}>
-          {SHOP_STYLES.map((style) => (
-            <FilterCheckbox
-              key={style.id}
-              label={style.label}
-              checked={filters.styles.includes(style.id)}
-              onChange={() => toggleStyle(style.id)}
             />
           ))}
         </FilterSection>

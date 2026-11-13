@@ -1,3 +1,4 @@
+import { useCategories } from "@/hooks/useCategories";
 import preferenceIcon from "@/assets/svgs/preference-horizontal.svg?raw";
 import { FilterModal } from "@/components/shop/FilterModal";
 import { ShopCategoryCard } from "@/components/shop/ShopCategoryCard";
@@ -7,23 +8,17 @@ import { Icon } from "@/components/ui/Icon";
 import { ItemsCarousel } from "@/components/ui/ItemsCarousel";
 import { Pagination } from "@/components/ui/Pagination";
 import { ProductCarouselCard } from "@/components/ui/ProductCarouselCard";
+import { ProductCardsSkeleton } from "@/components/ui/ProductCardsSkeleton";
 import { ROUTES } from "@/constants/routes";
 import {
   SHOP_CATALOG_PAGE_PARAM,
   SHOP_CATALOG_PAGE_SIZE,
-  SHOP_MAIN_CATEGORIES,
 } from "@/constants/shop";
 import { useCustomerProducts } from "@/hooks/useCustomerProducts";
 import { useShopParams } from "@/hooks/useShopParams";
 import { rememberShopReturn } from "@/utils/shopReturn";
 import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-
-const CATEGORY_CAROUSEL_ITEMS_PER_VIEW = [
-  { minWidth: 1024, count: 4 },
-  { minWidth: 640, count: 3 },
-  { minWidth: 0, count: 2 },
-];
 
 const NEW_ARRIVALS_ITEMS_PER_VIEW = [
   { minWidth: 1024, count: 5 },
@@ -33,6 +28,7 @@ const NEW_ARRIVALS_ITEMS_PER_VIEW = [
 
 export function ShopPage() {
   const navigate = useNavigate();
+  const catalogCategories = useCategories();
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const location = useLocation();
@@ -112,9 +108,35 @@ export function ShopPage() {
     applyFilters({ ...filterState, categories: nextCategories });
   }
 
-  if (isShopResultsMode) {
-    return (
-      <>
+  const CategoryHeading = isShopResultsMode ? "h2" : "h1";
+  const categoryList = (
+    <section className="space-y-4" aria-label="Product categories">
+      <div className="flex flex-wrap items-center justify-end gap-4 md:justify-between">
+        <div className="hidden md:block">
+          <CategoryHeading className="text-base font-semibold text-hero-dark">Product Categories</CategoryHeading>
+          <p className="mt-0.5 text-sm font-light text-hero-muted">Find your next device, desk essential or everyday accessory.</p>
+        </div>
+        <button type="button" onClick={() => setIsFilterOpen(true)} className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-hero-green hover:opacity-80">
+          <Icon svg={preferenceIcon} className="h-5 w-5 text-hero-green" /> All filters
+        </button>
+      </div>
+      <div className="category-list-scroll hidden overflow-x-auto pb-3 md:block" tabIndex={0} role="region" aria-label="Scroll product categories">
+        <ul className="flex w-max gap-3">
+          <li className="w-52 shrink-0"><ShopCategoryCard label="All products" isSelected={categories.length === 0} onSelect={() => applyFilters({ ...filterState, categories: [] })} /></li>
+          {catalogCategories.map((category) => (
+            <li key={category.id} className="w-52 shrink-0">
+              <ShopCategoryCard label={category.label} image={category.image} isSelected={categories.includes(category.id)} onSelect={() => toggleCategory(category.id)} />
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+
+  return (
+    <div className="space-y-6">
+      {categoryList}
+      {isShopResultsMode ? (
         <ShopResultsView
           query={query}
           sort={sort}
@@ -128,62 +150,16 @@ export function ShopPage() {
           onProductSelect={(product) => navigate(`/products/${product.id}`)}
           onOpenFilters={() => setIsFilterOpen(true)}
           onClearFilters={clearFilters}
+          showFiltersButton={false}
         />
-
-        <FilterModal
-          isOpen={isFilterOpen}
-          onClose={() => setIsFilterOpen(false)}
-          initialFilters={filterState}
-          onApply={applyFilters}
-          onClear={clearFilters}
-        />
-      </>
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-sm font-semibold text-hero-dark sm:text-base">
-            Product Categories
-          </h1>
-          <p className="mt-0.5 text-xs font-light text-hero-muted">
-            Browse our curated plant collections
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => setIsFilterOpen(true)}
-          className="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-hero-green transition-opacity hover:opacity-80"
-        >
-          <Icon svg={preferenceIcon} className="h-5 w-5 text-hero-green" />
-          All filters
-        </button>
-      </div>
-
-      <ItemsCarousel
-        showHeader={false}
-        items={SHOP_MAIN_CATEGORIES}
-        itemsPerView={CATEGORY_CAROUSEL_ITEMS_PER_VIEW}
-        renderItem={(category) => (
-          <ShopCategoryCard
-            label={category.label}
-            count={category.count}
-            image={category.image}
-            isSelected={categories.includes(category.id)}
-            onSelect={() => toggleCategory(category.id)}
-          />
-        )}
-      />
-
+      ) : <>
       <section className="space-y-4">
         <h2 className="text-sm font-semibold text-hero-dark">All Products</h2>
         {isLoadingProducts && (
           <p className="text-xs font-light text-hero-muted">Refreshing products...</p>
         )}
 
+        {!isLoadingProducts && products.length === 0 && <p className="rounded-xl bg-hero-sage/40 p-6 text-sm text-hero-muted">Our catalogue is being prepared. Browse the categories above or contact us for availability.</p>}
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5">
           {catalogProducts.map((product) => (
             <ShopProductCard
@@ -202,21 +178,23 @@ export function ShopPage() {
         />
       </section>
 
-      <ItemsCarousel
+      {isLoadingProducts ? <section aria-label="New Arrivals"><h2 className="mb-3 text-sm font-semibold text-hero-dark">New Arrivals</h2><ProductCardsSkeleton label="Loading New Arrivals" /></section> : <ItemsCarousel
         title="New Arrivals"
         viewAllHref={ROUTES.SHOP}
         items={newArrivals}
         itemsPerView={NEW_ARRIVALS_ITEMS_PER_VIEW}
-        renderItem={(plant) => (
+        renderItem={(product) => (
           <ProductCarouselCard
-            name={plant.name}
-            price={plant.price}
-            rating={plant.rating}
-            image={plant.image}
-            href={`/products/${plant.id}`}
+            name={product.name}
+            price={product.price}
+            rating={product.rating}
+            demo={product.demo}
+            image={product.image}
+            href={`/products/${product.id}`}
           />
         )}
-      />
+      />}
+      </>}
 
       <FilterModal
         isOpen={isFilterOpen}

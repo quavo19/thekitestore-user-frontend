@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 
 export function useCustomerProducts(search = "") {
   const [products, setProducts] = useState(DUMMY_PRODUCTS);
-  const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [isLoadingProducts, setIsLoadingProducts] = useState(true);
 
   useEffect(() => {
     let isMounted = true;

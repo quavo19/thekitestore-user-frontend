@@ -1,20 +1,23 @@
 @import "tailwindcss";
 
 @theme {
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.25rem;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.375rem;
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --font-serif: "Playfair Display", ui-serif, Georgia, serif;
-  --color-sidebar: #1a261c;
-  --color-sidebar-active: #2a3a2c;
-  --color-sidebar-card: #243528;
-  --color-sidebar-muted: #9aab95;
-  --color-accent-lime: #c5e047;
-  --color-secondary: #c5e047;
-  --color-ink: #2d264b;
-  --color-content: #ffffff;
-  --color-hero-dark: #0b2521;
-  --color-hero-green: #2d7d46;
-  --color-hero-sage: #dce8d8;
-  --color-hero-muted: #6b7280;
+  --color-sidebar: #f8f9fa;
+  --color-sidebar-active: #e5e7eb;
+  --color-sidebar-card: #f3f4f6;
+  --color-sidebar-muted: #4b5563;
+  --color-accent-lime: #e5e7eb;
+  --color-secondary: #d1d5db;
+  --color-ink: #1f2937;
+  --color-hero-dark: #202124;
+  --color-hero-green: #4b5563;
+  --color-hero-sage: #f0f1f2;
+  --color-hero-muted: #5f636b;
 }
 
 @layer base {
@@ -47,9 +50,9 @@
     animation: shimmer 1.4s linear infinite;
     background-image: linear-gradient(
       90deg,
-      rgb(220 232 216 / 0.35) 0%,
-      rgb(220 232 216 / 0.85) 50%,
-      rgb(220 232 216 / 0.35) 100%
+      rgb(229 231 235 / 0.45) 0%,
+      rgb(229 231 235 / 0.95) 50%,
+      rgb(229 231 235 / 0.45) 100%
     );
     background-size: 200% 100%;
   }
@@ -101,3 +104,31 @@
     overflow: hidden;
   }
 }
+
+/* Store navigation and shared page elements. */
+.kite-mark { display: inline-flex; align-items: center; justify-content: center; width: 35px; height: 40px; border-radius: 11px; background: #202124; color: white; font-size: 28px; font-weight: 500; flex-shrink: 0; }
+.category-nav { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 7px 12px; border-radius: 9px; font-size: 15px; color: #374151; transition: background .2s, color .2s; }
+.category-nav:hover { background: #f3f4f6; color: #111827; }
+.category-nav.selected { background: #eef0f2; color: #111827; font-weight: 600; }
+.category-nav > span:first-child:not(:last-child) { min-width: 28px; font-size: 21px; text-align: center; }
+.category-nav img { filter: grayscale(1) brightness(.68); }
+.eyebrow { display: block; font-size: 12px; letter-spacing: .17em; font-weight: 600; }
+.store-home { max-width: 1600px; margin-inline: auto; color: #202124; }
+.store-button { display: inline-flex; align-items: center; justify-content: center; gap: 23px; border-radius: 8px; background: #202124; padding: 14px 18px; color: white; font-size: 14px; font-weight: 500; }
+.store-button:hover { background: #374151; }
+.section-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 23px; }
+.setup-story { display: grid; grid-template-columns: 1fr 1fr; margin-top: 45px; border-radius: 20px; overflow: hidden; background: #f3f4f6; }
+.setup-story > img { width: 100%; height: 100%; min-height: 370px; max-height: 430px; object-fit: cover; }
+.setup-story > div { padding: 42px; }
+.setup-story h2 { font-size: clamp(28px, 3vw, 44px); font-weight: 600; line-height: 1.1; letter-spacing: -.055em; margin: 22px 0 18px; }
+.setup-story p { font-size: 14px; line-height: 1.9; color: #5f636b; margin-bottom: 22px; max-width: 340px; }
+a:focus-visible, button:focus-visible { outline: 2px solid #374151; outline-offset: 4px; }
+@media(max-width:767px) { .setup-story { grid-template-columns: 1fr; } .setup-story > img { min-height: 230px; max-height: 270px; } .setup-story > div { padding: 30px; } }
+@media(prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; } }
+
+/* Keep category navigation under the shopper's control. */
+.category-list-scroll { scrollbar-width: thin; scrollbar-color: #9ca3af #f3f4f6; }
+.category-list-scroll::-webkit-scrollbar { height: 7px; }
+.category-list-scroll::-webkit-scrollbar-track { background: #f3f4f6; border-radius: 999px; }
+.category-list-scroll::-webkit-scrollbar-thumb { background: #9ca3af; border-radius: 999px; }
+.category-list-scroll:focus-visible { outline: 2px solid #374151; outline-offset: 3px; }

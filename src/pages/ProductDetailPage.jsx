@@ -8,6 +8,7 @@ import { ROUTES } from "@/constants";
 import { useCart } from "@/contexts/CartContext";
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
+import { displayText } from "@/utils/displayText";
 import { cn } from "@/utils";
 
 function money(value) {
@@ -347,6 +348,7 @@ export function ProductDetailPage() {
 
         <div className="space-y-6">
           <div>
+            {(product.hotDeal || product.demo) && <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-hero-green">{product.demo ? "Sample listing · not for sale" : outOfStock ? "Hot Deal · pre-owned, sold out" : "Hot Deal · pre-owned, one available"}</p>}
             <h1 className="font-serif text-4xl text-hero-dark sm:text-5xl">{product.name}</h1>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <Stars value={Math.round(reviewSummary.average_points || product.rating || 0)} />
@@ -369,6 +371,7 @@ export function ProductDetailPage() {
               Earn <span className="font-bold">#{Number(product.bonusPoints || 0).toLocaleString()}</span> bonus points
             </p>
           )}
+          {product.hotDeal && <div className="rounded-xl border border-gray-200 bg-gray-50 p-4"><h2 className="text-sm font-semibold text-hero-dark">Condition and known faults</h2><p className="mt-2 whitespace-pre-line text-sm leading-6 text-hero-muted">{product.conditionNotes}</p></div>}
           <div>
             <p className="text-sm font-light leading-7 text-hero-muted">{visibleDescription}</p>
             {shouldClampDescription && (
@@ -409,7 +412,7 @@ export function ProductDetailPage() {
                             selected && "!bg-[#0f5f37] !text-white hover:!bg-[#0f5f37]",
                           )}
                         >
-                          {option.name}
+                          {displayText(option.name)}
                         </button>
                       );
                     })}
@@ -487,8 +490,8 @@ export function ProductDetailPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               {product.meta.slice(0, 4).map((meta) => (
                 <div key={meta.id || meta.name} className="bg-hero-sage/20 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">{meta.name}</p>
-                  <p className="mt-2 text-sm font-medium text-hero-dark">{meta.value}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-hero-muted">{displayText(meta.name)}</p>
+                  <p className="mt-2 text-sm font-medium text-hero-dark">{displayText(meta.value)}</p>
                 </div>
               ))}
             </div>
@@ -541,7 +544,7 @@ export function ProductDetailPage() {
                       <Stars value={attrs.points} />
                     </div>
                     {attrs.comment && (
-                      <p className="mt-4 text-sm font-light leading-6 text-hero-muted">{attrs.comment}</p>
+                      <p className="mt-4 text-sm font-light leading-6 text-hero-muted">{displayText(attrs.comment)}</p>
                     )}
                   </article>
                 );

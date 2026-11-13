@@ -16,7 +16,7 @@ export const ABOUT_HERO = {
   eyebrow: "Welcome to The Kite Store",
   headline: "Plants That Belong In Real Homes",
   description:
-    "We design plant experiences for real lives and real routines — living systems that quietly integrate into how you already move through your space.",
+    "We design plant experiences for real lives and real routines, with living systems that quietly integrate into how you already move through your space.",
   badge: "Biophilic Design Studio",
   images: {
     main: banner3,
@@ -30,14 +30,14 @@ export const ABOUT_WHY_CHOOSE_US = {
   description:
     "At The Kite Store, we design plant experiences that belong in real homes, real lives, and real routines. Not as decoration that demands attention, but as living systems that quietly integrate into how you already move through your space.",
   closing:
-    "The result is a space that feels grounded and alive at once — clean but not empty, green but not chaotic, designed but never forced.",
+    "The result is a space that feels grounded and alive at once: clean but not empty, green but not chaotic, designed but never forced.",
   image: banner2,
   features: [
     {
       id: 1,
       title: "Intentional Placement",
       description:
-        "We begin with the space itself — how light moves, how people flow, and where stillness naturally exists. Every placement is designed to grow with you.",
+        "We begin with the space itself: how light moves, how people flow, and where stillness naturally exists. Every placement is designed to grow with you.",
       icon: leavesIcon,
       iconBg: "bg-[#E4F0E4]",
     },
@@ -45,7 +45,7 @@ export const ABOUT_WHY_CHOOSE_US = {
       id: 2,
       title: "Function & Feeling",
       description:
-        "Plants are selected based on function, feeling, and long-term harmony rather than trends — so your space stays cohesive over time.",
+        "Plants are selected based on function, feeling, and long-term harmony rather than trends, so your space stays cohesive over time.",
       icon: medalIcon,
       iconBg: "bg-[#F0F4D8]",
     },
@@ -53,7 +53,7 @@ export const ABOUT_WHY_CHOOSE_US = {
       id: 3,
       title: "Grounded & Alive",
       description:
-        "We create environments that feel natural and enduring — clean but not empty, green but not chaotic, designed but never forced.",
+        "We create environments that feel natural and enduring: clean but not empty, green but not chaotic, designed but never forced.",
       icon: securityCheckIcon,
       iconBg: "bg-[#FAEBE0]",
     },

@@ -1,5 +1,6 @@
 import { api } from "@/api";
-import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
+import { categorySlug } from "@/constants/catalog";
+import { displayText } from "@/utils/displayText";
 
 const PRODUCT_CACHE_TTL = 60_000;
 const productCache = new Map();
@@ -30,29 +31,33 @@ function productFromItem(item) {
 
 export function normalizeApiProduct(record) {
   const attributes = record?.attributes ?? record ?? {};
-  const image = attributes.image_url || attributes.images?.[0]?.url || DUMMY_PRODUCTS[0]?.image || "";
+  const image = attributes.image_url || attributes.images?.[0]?.url || `/catalog/${categorySlug(attributes.category?.name || "phones")}.svg`;
   const defaultStock = attributes.default_variant_stock || attributes.defaultVariantStock || null;
   const price = Number(defaultStock?.price ?? attributes.base_price ?? attributes.price ?? 0);
-  const category = attributes.category?.id || attributes.category?.name || "plants";
+  const category = categorySlug(attributes.category?.name || "");
 
   return {
     id: record?.id ?? attributes.id,
     slug: record?.id ?? attributes.id,
-    name: attributes.name || "Product",
-    description: attributes.description || "",
+    name: displayText(attributes.name || "Product"),
+    description: displayText(attributes.description || ""),
+    hotDeal: Boolean(attributes.hot_deal),
+    conditionNotes: displayText(attributes.condition_notes || ""),
+    demo: Boolean(attributes.demo),
     category,
+    categoryIds: [attributes.category, ...(attributes.categories || [])].filter(Boolean).flatMap(item => [String(item.id), categorySlug(item.name)]),
     size: "medium",
-    availability: attributes.status === "out_of_stock" ? "out-of-stock" : "in-stock",
+    availability: !attributes.demo && Number(defaultStock?.available_quantity || 0) > 0 ? "in-stock" : "out-of-stock",
     style: "modern",
     price,
-    originalPrice: price,
+    originalPrice: Number(attributes.compare_at_price || price),
     bonusPoints: Number(attributes.bonus_points || attributes.bonusPoints || 0),
     affiliateCommissionAmount: Number(
       attributes.affiliate_commission_amount ||
         attributes.affiliateCommissionAmount ||
         0,
     ),
-    rating: Number(attributes.review_summary?.average_points || 5),
+    rating: Number(attributes.review_summary?.average_points || 0),
     reviewCount: Number(attributes.review_summary?.total_reviews || 0),
     image,
     images: attributes.images || [],
@@ -105,9 +110,15 @@ export const customerService = {
     if (cached) return cached;
 
     const response = await api.get(`/customer/products?${query.toString()}`);
+    const records = [...(response.data || [])];
+    for (let page = 2; page <= (response.meta?.total_pages || 1); page += 1) {
+      query.set("page", page);
+      const next = await api.get(`/customer/products?${query.toString()}`);
+      records.push(...(next.data || []));
+    }
     return cacheSet(cacheKey, {
       ...response,
-      products: (response?.data || []).map(normalizeApiProduct),
+      products: records.map(normalizeApiProduct),
     });
   },
   getProduct: async (productId) => {

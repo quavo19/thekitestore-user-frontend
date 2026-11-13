@@ -39,7 +39,7 @@ function money(value) {
 }
 
 function dateLabel(value) {
-  if (!value) return "—";
+  if (!value) return "Not available";
   return new Intl.DateTimeFormat("en", {
     month: "short",
     day: "numeric",

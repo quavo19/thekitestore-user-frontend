@@ -1,109 +1,18 @@
-import plant1 from "@/assets/images/plants/plant1.png";
-import plant2 from "@/assets/images/plants/plant2.png";
-
-export const HERO_AVATARS = [
-  { id: 1, image: plant1, name: "Sarah" },
-  { id: 2, image: plant2, name: "James" },
-  { id: 3, image: plant1, name: "Mia" },
-];
+import iphone16 from "@/assets/images/devices/iphone16.png";
+import iphone16pro from "@/assets/images/devices/iphone16pro.png";
+import macbook from "@/assets/images/devices/macbook.png";
+import airpodmax from "@/assets/images/devices/airpodmax.png";
 
 export const HERO_SHOWCASE_SLIDES = [
-  {
-    id: 1,
-    image: plant2,
-    badge: "4.8K+",
-    testimonial: {
-      quote: "My plants have never been happier!",
-      author: "Mahbuba I.",
-      avatar: plant1,
-      rating: 5,
-    },
-  },
-  {
-    id: 2,
-    image: plant1,
-    badge: "4.8K+",
-    testimonial: {
-      quote: "Beautiful plants, fast delivery!",
-      author: "Daniel K.",
-      avatar: plant2,
-      rating: 5,
-    },
-  },
-  {
-    id: 3,
-    image: plant2,
-    badge: "4.8K+",
-    testimonial: {
-      quote: "Expert care tips made all the difference.",
-      author: "Lena P.",
-      avatar: plant1,
-      rating: 5,
-    },
-  },
+  { id: "iphone-16", name: "iPhone 16", image: iphone16, caption: "Find the right iPhone for you." },
+  { id: "iphone-16-pro", name: "iPhone 16 Pro", image: iphone16pro, caption: "Explore more ways to connect." },
+  { id: "macbook", name: "MacBook", image: macbook, caption: "A little more room to create." },
+  { id: "airpods", name: "AirPods Max", image: airpodmax, caption: "Find your favourite sound." },
 ];
-
-export const HERO_FEATURED_PLANTS = [
-  {
-    id: 1,
-    label: "This Week's Featured Plant",
-    name: "Monstera Deliciosa",
-    price: 34.99,
-    originalPrice: 49.99,
-    image: plant1,
-  },
-  {
-    id: 2,
-    label: "This Week's Featured Plant",
-    name: "Fiddle Leaf Fig",
-    price: 42.99,
-    originalPrice: 58.99,
-    image: plant2,
-  },
-  {
-    id: 3,
-    label: "This Week's Featured Plant",
-    name: "Snake Plant",
-    price: 28.99,
-    originalPrice: 39.99,
-    image: plant1,
-  },
-];
-
-export const HERO_RATING = {
-  score: "4.9",
-  label: "Customer Rating",
-  stars: 5,
-};
-
-export const HERO_SOCIAL_PROOF = {
-  count: "20K",
-  label: "Happy Plant Parents",
-};
 
 export const HERO_FEATURES = [
-  {
-    id: 1,
-    title: "Handpicked Quality",
-    description: "Carefully selected healthy plants",
-    iconBg: "bg-[#F0F4D8]",
-  },
-  {
-    id: 2,
-    title: "Fast & Safe Delivery",
-    description: "Secure packaging right to your door",
-    iconBg: "bg-[#E4F0E4]",
-  },
-  {
-    id: 3,
-    title: "Expert Guidance",
-    description: "Care tips and support for every plant",
-    iconBg: "bg-[#FAEBE0]",
-  },
-  {
-    id: 4,
-    title: "Plant Happiness Guarantee",
-    description: "Care tips and support for every plant",
-    iconBg: "bg-[#F9E8EB]",
-  },
+  { id: 1, title: "Find your device", description: "Explore phones, Macs and more", iconBg: "bg-gray-100" },
+  { id: 2, title: "Delivery options", description: "Shop from wherever you are in Ghana", iconBg: "bg-gray-100" },
+  { id: 3, title: "Everyday accessories", description: "Find the extras for your devices", iconBg: "bg-gray-100" },
+  { id: 4, title: "Independent store", description: "Here to help with your order", iconBg: "bg-gray-100" },
 ];

@@ -88,7 +88,8 @@ export function ShopProductCard({
       tabIndex={0}
     >
       <div className="relative overflow-hidden rounded-2xl bg-gray-50">
-        {showWishlist && (
+        {(product.demo || product.hotDeal) && <span className="absolute left-3 top-3 z-[1] rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-hero-dark shadow-sm">{product.demo ? "Sample listing" : product.availability === "in-stock" ? "Pre-owned · one available" : "Pre-owned · sold out"}</span>}
+        {showWishlist && !product.demo && (
           <button
             type="button"
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
@@ -119,7 +120,7 @@ export function ShopProductCard({
           </button>
         )}
 
-        {showAddToCart && (
+        {showAddToCart && !product.demo && (
           <div className="absolute bottom-3 right-3 z-[1]">
             <AddToCartIconButton
               productId={product.id}
@@ -133,7 +134,7 @@ export function ShopProductCard({
           <img
             src={product.image}
             alt={product.name}
-            className="absolute inset-0 h-full w-full object-cover object-center"
+            className="absolute inset-0 h-full w-full object-contain object-center p-4"
           />
         </div>
       </div>
@@ -143,6 +144,7 @@ export function ShopProductCard({
           {product.name}
         </h3>
 
+        {product.hotDeal && <p className="line-clamp-2 text-xs leading-relaxed text-hero-muted">{product.conditionNotes}</p>}
         <div className="flex items-center gap-2">
           <ProductStars rating={product.rating} />
           <span className="text-xs font-light text-hero-muted">
@@ -166,7 +168,7 @@ export function ShopProductCard({
               <p className="text-xs font-semibold text-hero-green">
                 {money(affiliateCommissionAmount)}
               </p>
-              <p className="text-[10px] italic text-hero-muted">
+              <p className="text-xs italic text-hero-muted">
                 Affiliate earning
               </p>
             </div>

@@ -73,7 +73,7 @@ function CartLineItem({ product, quantity, onUpdateQuantity, onRemove }) {
             {variantLabel(product).length > 0 && (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {variantLabel(product).map((option) => (
-                  <span key={option} className="bg-hero-sage/35 px-2 py-1 text-[11px] font-medium text-hero-dark">
+                  <span key={option} className="bg-hero-sage/35 px-2 py-1 text-xs font-medium text-hero-dark">
                     {option}
                   </span>
                 ))}
@@ -248,7 +248,7 @@ export function CartModal() {
               Your cart is empty
             </p>
             <p className="mt-2 text-sm font-light text-hero-muted">
-              Browse plants and add your favourites to get started.
+              Browse devices and accessories to find your next favourite.
             </p>
           </div>
         )}

@@ -147,7 +147,7 @@ export function ProfilePage() {
   const displayName =
     `${user?.first_name || ""} ${user?.last_name || ""}`.trim() ||
     user?.email ||
-    "Plant lover";
+    "Kite customer";
   const bonusBalance = Number(user?.bonus?.balance || 0);
   const userPhones = Array.isArray(user?.phone_numbers)
     ? user.phone_numbers.filter(Boolean).slice(0, 3)

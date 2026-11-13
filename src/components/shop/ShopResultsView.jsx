@@ -1,3 +1,5 @@
+import { useCategories } from "@/hooks/useCategories";
+import { useSearchParams } from "react-router-dom";
 import preferenceIcon from "@/assets/svgs/preference-horizontal.svg?raw";
 import arrowIcon from "@/assets/svgs/arrow-Up.svg?raw";
 import { Icon } from "@/components/ui/Icon";
@@ -80,8 +82,12 @@ export function ShopResultsView({
   onClearFilters,
   showFiltersButton = true,
 }) {
+  const catalogCategories = useCategories();
+  const [searchParams] = useSearchParams();
+  const selectedIds = (searchParams.get("category") || "").split(",");
+  const categoryLabel = catalogCategories.filter(item => selectedIds.includes(item.id) || selectedIds.includes(item.apiId)).map(item => item.label).join(", ");
   const hasQuery = Boolean(query.trim());
-  const displayQuery = hasQuery ? query.trim() : "all plants";
+  const displayQuery = hasQuery ? query.trim() : "all products";
   const resultLabel =
     totalCount >= 1500 ? "1,500+ Items found" : `${totalCount} Items found`;
 
@@ -90,7 +96,7 @@ export function ShopResultsView({
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex flex-wrap items-baseline gap-2">
           <h1 className="text-xl font-semibold text-hero-dark sm:text-2xl">
-            Search results for {displayQuery}
+            {hasQuery ? `Search results for ${displayQuery}` : categoryLabel || "All products"}
           </h1>
           <span className="text-sm font-light text-hero-muted">{resultLabel}</span>
         </div>
@@ -123,7 +129,7 @@ export function ShopResultsView({
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-gray-200 px-6 py-16 text-center">
-          <p className="text-base font-medium text-hero-dark">No plants found</p>
+          <p className="text-base font-medium text-hero-dark">No products found</p>
           <p className="mt-2 text-sm font-light text-hero-muted">
             Try adjusting your search or clearing filters.
           </p>
