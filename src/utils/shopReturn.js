@@ -1,6 +1,6 @@
 import { ROUTES } from "@/constants";
 
-export const SHOP_RETURN_STORAGE_KEY = "karaboome-shop-return";
+export const SHOP_RETURN_STORAGE_KEY = "thekitestore-user-frontend-shop-return";
 
 export function rememberShopReturn(path) {
   if (!path) return;

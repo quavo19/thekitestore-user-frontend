@@ -1,4 +1,4 @@
-export const APP_NAME = "Kara Bloome";
+export const APP_NAME = "The Kite Store";
 
 export const LOGO_SRC = "/logo.jpeg";
 

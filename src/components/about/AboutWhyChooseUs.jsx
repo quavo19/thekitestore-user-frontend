@@ -34,7 +34,7 @@ export function AboutWhyChooseUs() {
 
         <div className="absolute top-6 left-6 hidden rounded-lg bg-white/95 px-4 py-3 shadow-sm backdrop-blur-sm sm:block">
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-hero-green">
-            Kara Bloome Store
+            The Kite Store Store
           </p>
           <p className="mt-1 font-serif text-sm leading-snug text-hero-dark">
             The Perfect

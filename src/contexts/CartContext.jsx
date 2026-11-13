@@ -3,8 +3,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
 
-const CART_STORAGE_KEY = "karaboome-cart";
-const GUEST_STORAGE_KEY = "karaboome-guest-shopper";
+const CART_STORAGE_KEY = "thekitestore-user-frontend-cart";
+const GUEST_STORAGE_KEY = "thekitestore-user-frontend-guest-shopper";
 
 function readStoredCart() {
   try {

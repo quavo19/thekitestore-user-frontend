@@ -1,6 +1,6 @@
 import { API_BASE_URL } from "@/constants";
 
-const AUTH_TOKEN_STORAGE_KEY = "karaboome-auth-token";
+const AUTH_TOKEN_STORAGE_KEY = "thekitestore-user-frontend-auth-token";
 
 class HttpClient {
   constructor(baseURL = API_BASE_URL) {

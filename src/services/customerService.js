@@ -3,9 +3,9 @@ import { DUMMY_PRODUCTS } from "@/constants/dummyProducts";
 
 const PRODUCT_CACHE_TTL = 60_000;
 const productCache = new Map();
-const AFFILIATE_VISITOR_STORAGE_KEY = "karaboome-affiliate-visitor-id";
-const AFFILIATE_ATTRIBUTION_STORAGE_KEY = "karaboome-affiliate-attribution";
-const AFFILIATE_SIGNUP_CLAIM_STORAGE_KEY = "karaboome-affiliate-signup-claim";
+const AFFILIATE_VISITOR_STORAGE_KEY = "thekitestore-user-frontend-affiliate-visitor-id";
+const AFFILIATE_ATTRIBUTION_STORAGE_KEY = "thekitestore-user-frontend-affiliate-attribution";
+const AFFILIATE_SIGNUP_CLAIM_STORAGE_KEY = "thekitestore-user-frontend-affiliate-signup-claim";
 
 function cacheGet(key) {
   const cached = productCache.get(key);

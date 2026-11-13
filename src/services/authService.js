@@ -1,8 +1,8 @@
 import { api } from "@/api";
 import { API_BASE_URL } from "@/constants";
 
-export const AUTH_TOKEN_STORAGE_KEY = "karaboome-auth-token";
-export const AUTH_REDIRECT_STORAGE_KEY = "karaboome-auth-redirect";
+export const AUTH_TOKEN_STORAGE_KEY = "thekitestore-user-frontend-auth-token";
+export const AUTH_REDIRECT_STORAGE_KEY = "thekitestore-user-frontend-auth-redirect";
 
 export const authService = {
   googleAuthUrl: () => {

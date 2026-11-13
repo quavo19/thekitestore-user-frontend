@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { useUser } from "@/contexts/UserContext";
 import { customerService } from "@/services";
 
-const STORAGE_KEY = "karaboome-wishlist";
+const STORAGE_KEY = "thekitestore-user-frontend-wishlist";
 
 function readStoredIds() {
   try {

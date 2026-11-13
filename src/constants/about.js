@@ -13,7 +13,7 @@ import docIcon from "@/assets/svgs/doc-1.svg?raw";
 import groupIcon from "@/assets/svgs/Group.svg?raw";
 
 export const ABOUT_HERO = {
-  eyebrow: "Welcome to Kara Bloome",
+  eyebrow: "Welcome to The Kite Store",
   headline: "Plants That Belong In Real Homes",
   description:
     "We design plant experiences for real lives and real routines — living systems that quietly integrate into how you already move through your space.",
@@ -28,7 +28,7 @@ export const ABOUT_HERO = {
 export const ABOUT_WHY_CHOOSE_US = {
   title: "Why Choose Us?",
   description:
-    "At Kara Bloome, we design plant experiences that belong in real homes, real lives, and real routines. Not as decoration that demands attention, but as living systems that quietly integrate into how you already move through your space.",
+    "At The Kite Store, we design plant experiences that belong in real homes, real lives, and real routines. Not as decoration that demands attention, but as living systems that quietly integrate into how you already move through your space.",
   closing:
     "The result is a space that feels grounded and alive at once — clean but not empty, green but not chaotic, designed but never forced.",
   image: banner2,
@@ -63,9 +63,9 @@ export const ABOUT_WHY_CHOOSE_US = {
 export const ABOUT_OVERVIEW = {
   title: "Overview",
   paragraphs: [
-    "At Kara Bloome, we understand that plants bring life and balance into every space. Our work focuses on biophilic design, creating calm, well-designed environments through expert plant care and clean, nature-inspired décor.",
+    "At The Kite Store, we understand that plants bring life and balance into every space. Our work focuses on biophilic design, creating calm, well-designed environments through expert plant care and clean, nature-inspired décor.",
     "Whether supporting first-time plant owners or designing curated indoor and outdoor green spaces, we provide practical guidance, tailored consultations, and plant design solutions that are both functional and aesthetically refined.",
-    "From selecting plants suited to your light conditions, lifestyle, and space, to arranging them with purpose, Kara Bloome combines technical knowledge, thoughtful design, and a balanced approach to deliver environments that feel natural, cohesive, and enduring.",
+    "From selecting plants suited to your light conditions, lifestyle, and space, to arranging them with purpose, The Kite Store combines technical knowledge, thoughtful design, and a balanced approach to deliver environments that feel natural, cohesive, and enduring.",
   ],
   image: banner1,
 };
@@ -73,7 +73,7 @@ export const ABOUT_OVERVIEW = {
 export const ABOUT_MISSION = {
   title: "Mission",
   description:
-    "Kara Bloome exists to enhance living and working spaces through professional plant care and refined, nature-inspired décor. We deliver thoughtful solutions that combine aesthetics, functionality, and environmental responsibility.",
+    "The Kite Store exists to enhance living and working spaces through professional plant care and refined, nature-inspired décor. We deliver thoughtful solutions that combine aesthetics, functionality, and environmental responsibility.",
 };
 
 export const ABOUT_VISION = {
@@ -85,7 +85,7 @@ export const ABOUT_VISION = {
 export const ABOUT_VALUES = {
   title: "Our Values",
   description:
-    "We are guided by professionalism, sustainability, and intentional design. Kara Bloome is committed to responsible plant care, quality service delivery, and creating spaces that are balanced, healthy, and enduring.",
+    "We are guided by professionalism, sustainability, and intentional design. The Kite Store is committed to responsible plant care, quality service delivery, and creating spaces that are balanced, healthy, and enduring.",
   pillars: ["Professionalism", "Sustainability", "Intentional Design"],
 };
 

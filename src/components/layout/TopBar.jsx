@@ -322,7 +322,7 @@ export function TopBar() {
                   <div>
                     <div className="px-6 text-center">
                       <p className="text-base font-semibold text-ink">
-                        Get started on Kara Bloome
+                        Get started on The Kite Store
                       </p>
                       <button
                         type="button"
@@ -367,7 +367,7 @@ export function TopBar() {
                         type="button"
                         className="block cursor-pointer py-1 text-left text-sm font-light text-hero-muted hover:text-ink"
                       >
-                        Become a Kara Bloome member
+                        Become a The Kite Store member
                       </button>
                       <button
                         type="button"

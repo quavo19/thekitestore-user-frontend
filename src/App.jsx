@@ -1,3 +1,4 @@
+import { ShopAssistant } from "@/components/assistant/ShopAssistant";
 import { AppProvider } from "@/contexts/AppContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
@@ -13,6 +14,7 @@ function App() {
           <WishlistProvider>
             <CartProvider>
               <AppRouter />
+              <ShopAssistant />
             </CartProvider>
           </WishlistProvider>
         </SidebarProvider>
